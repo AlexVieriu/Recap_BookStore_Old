@@ -1,0 +1,97 @@
+﻿7. Tour of Project Structure and Files
+
+-> create a WebApplication project with default authentification 
+
+-- Startup.cs --
+
+-> ConfigureServices
+-> Configure
+
+-> delete folders that we don't need
+-> create a API HomeController
+-> create a Index with a return message : "Hello World"(use PostMan)
+
+
+8. Why Razor and not API Template
+
+The major reason for this is the fact that choosing to include Authentication in the Razor template, 
+gave us quite a few things that would have required some manual configurations. 
+In my book, it would have required more to configure those things, than it required to delete a few 
+files and change the middlewares.
+
+-> Libraries required for Identity
+-> Libraries required for EntityFrameworkCore
+-> Middleware configurations for Entity Framework and Identity
+-> Required Data files (ApplicationDbContext and Migration Files)
+
+
+
+9. Configuring and Using Swagger UI
+
+-> install the NugetPackage for Swagger : Swagger, SwaggerGen, SwaggerUI
+-> set ConfigureServices for Swagger
+-> set Configure for Swagger
+
+-> run the app ( why crashed?):  
+
+-> delete the HomeController 
+-> create a HomeController with read/write actions
+
+-> include XML documentation
+-> supress warnings
+-> get the path where our xml documentation is (StartUp.cs)
+-> ConfigureServicies: configure the xml documentation for Swagger
+
+var xfile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xpath = Path.Combine(AppContext.BaseDirectory, xfile);
+                c.IncludeXmlComments(xpath);
+
+-> Configure the SwaggerUI so when we run it we do directly to UI : /swagger
+
+
+10. Configure Logging using NLog
+
+-> install Nuget Package : NLog.Extensions.Logging
+-> create nlog.config and setup it 
+
+<?xml version="1.0" encoding="utf-8" ?>
+<nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      autoReload="true"
+      internalLogLevel="Trace"
+      internalLogFile="C:\Users\alexandru.vieriu\Desktop\New folder\BookStore\logs\internallog.txt">
+
+  <targets>
+    <target name="logfile" xsi:type="File"
+            fileName="C:\Users\alexandru.vieriu\Desktop\New folder\BookStore\logs\${shortdate}_logfile.txt"
+            layout="${longdate} ${level:uppercase=true} ${message}"/>
+  </targets>
+
+  <rules>
+    <logger name="*" minlevel="Debug" writeTo="logfile" />
+  </rules>
+</nlog>
+
+-- HomeController.cs --
+
+-> create Ctor (Dependencies Injections)
+-> create logs for each of the methods in the HomeController (get, post, put, delete)
+-> view the logs
+
+-> create 2 files : Contracts	-> ILoggerService.cs :  LogDebug(), LogError(), LogInfo(), LogWarn()
+		    Servicies	-> LoggerService.cs  :  LogDebug(), LogError(), LogInfo(), LogWarn()
+
+-> add ILoggerService.cs, LoggerService.cs to ConfigureServices
+
+-- HomeController.cs --
+
+-> creating the ctor with ILogger
+-> add Log Messages for test
+
+
+11. CORS Configuration
+
+-> cross origin resource sharing : gives rigths to other users who are not on the same domain as us
+
+Configure CORS in:  -> ConfigureServices
+                    -> Configure

@@ -1,0 +1,247 @@
+﻿35. Scaffold Identity Tables to Existing Database
+
+-> Scaffold : the proccess for what we autogenerate things
+-> search : Package Manager Console
+			-> update-database (will create tables for the autentification using EntityFramework)
+
+AspNetRoles
+AspNetUsers
+AspNetRoleClaims
+AspNetUserClaims
+AspNetUserLogins
+AspNetUserRoles
+AspNetUserTokens
+
+services.AddDefaultIdentity<IdentityUser>()
+        .AddRoles<IdentityRole>()
+        .AddEntityFrameworkStores<ApplicationDbContext>();
+
+(1:25)
+services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+-> will do a 2 step registration, validating with email
+
+
+36. Seed Test Users and Roles
+
+IdentityUser -> dbo.AspNetUsers
+IdentityRole -> dbo.AspRoles 
+
+-> Data -> SeedData.cs	:   Seed(), 
+                            SeedUsers() : users -> admin, Customer1, Customer2
+                            SeedRoles() : roles -> Customer, Administrator
+
+Functions that we use:
+
+SeedUsers()->	userManager.FindByEmailAsync()
+				userManager.CreateAsync()
+				userManager.AddToRoleAsync()
+
+SeedRoles()->	roleManager.RoleExistsAsync()
+				roleManager.CreateAsync()
+
+
+-- Startup.cs --
+
+-> add parameters to Configuration: UserManager<IdentityUser> userManager,
+                                    RoleManager<IdentityRole> roleManager
+
+-> put it in the pipeline : SeedData.Seed(userManager, roleManager).Wait();
+
+Important!!! 
+
+-> the order of the servicies added matters:
+
+services.AddDefaultIdentity<IdentityUser>()
+        .AddRoles<IdentityRole>()
+        .AddEntityFrameworkStores<ApplicationDbContext>();
+
+-> AddSingleton vs AddTransit vs AddScope : 
+https://www.youtube.com/watch?v=01C8selSVCY&ab_channel=RawCoding
+
+
+Dictionary:
+.RoleExistsAsync("Administrator") : Gets a flag indicating whether the specified roleName exists.
+.FindByNameAsync("Administrator") : Finds the role associated with the specified roleName if any. ???? 
+
+
+37. Setup Users Controller
+
+-> DTOs : UserDTO (Username, Password)
+-> config the JWT in appsettings.json : "Key",  "Issuer"
+
+-> Controllers -> UsersController.cs :
+
+[HttpPost]
+- ctor                          -> SignInManager, UserManager, ILoggerService, IConfiguration
+- Login()                       
+- GetControllerActionNames()    
+- InternalError()               
+
+
+Dictionary: 
+
+https://www.youtube.com/watch?v=TfarnVqnhX0&ab_channel=kudvenkat	
+
+UserManager	 :  -> manage the user operations
+                -> provides the APIs for managing user in a persistence store.
+                -> is accepting a generic class, so we can put our custom class of users with details about the user
+
+-> Methods :-> CreateAsync
+            -> DeleteAsync
+            -> UpdateAsync 
+            -> FindByNameAsync
+
+SignInManager:  -> manage signIn, signOut, authentification stuff
+                -> provides the APIs for user sign in
+
+-> Methods :    -> SignInAsync(IdentityUser user, bool isPersistent) 
+                -> SignOutAsync
+                -> IsSigneIn
+                -> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
+                    -> Attempts to sign in the specified userName and password combination as 
+                    an asynchronous operation.
+
+bool isPersistent: it is used to store Season cookie , Permanent cookie
+
+Season cookie       : will end after we close the windows chrome
+Permenant cookie    : will be stored in the client machine 
+
+-> if we put [Authorize] on the top of the controller, every method in the controller will need authentication
+-> every implementation that is declaired at the level of the Method will override that from the controller
+
+-> get the information for overloading: Ctrl + Shift + Space
+
+
+IConfiguration      : Represents a set of key/value application configuration properties.
+SymmetricSecurityKey: takes the byte array of the key as a paramater
+GetBytes            : when overridden in a derived class, encodes all the characters in the specified string into 
+                      a sequence of bytes
+SigningCredentials  : 
+GetRolesAsync       :
+
+
+38. What is JWT-based Authentication?
+
+Tutorial JWT token  : https://www.youtube.com/watch?v=9QU_y7-VsC8&ab_channel=IAmTimCorey
+                      https://www.youtube.com/watch?v=qDJYgGzmalQ&ab_channel=NickChapsas
+
+https://jwt.io/
+
+Dictionary :
+-> JSON Web Token (JWT) is a compact library for securely transmitting information 
+between parties as a JSON object.
+
+-> The JWT specification defines seven reserved claims that are not required, but 
+are recommended to allow interoperability with every application. These are:
+
+iss (issuer)            : Issuer of the JWT
+sub (subject)           : Subject of the JWT (the user)
+aud (audience)          : Recipient for which the JWT is intended
+exp (expiration time)   : Time after which the JWT expires
+nbf (not before time)   : Time before which the JWT must not be accepted for processing
+iat (issued at time)    : Time at which the JWT was issued; can be used to determine age of the JWT
+jti (JWT ID)            : Unique identifier; can be used to prevent the JWT from being replayed 
+                          (allows a token to be used only once)
+
+JWT structure example :
+
+Head : 
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+
+Payload: 
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022
+}
+
+Verify Signature:
+HMACSHA256(
+  base64UrlEncode(header) + "." +
+  base64UrlEncode(payload),
+  
+your-256-bit-secret
+
+) 
+
+
+39. Setup JSON Web Tokens (JWT) Authentication    
+
+https://www.youtube.com/watch?v=M6AkbBaDGJE&ab_channel=NickChapsas
+
+->JWT : a string that has encoded the user info used when sending API calls
+
+--appsettings.json --
+
+-> create JWT token 
+    -> generate GUID
+
+Add a NugetPackage: jwtbearer
+
+
+-- Startup.cs --
+
+JwtBearerDefaults               : Default values used by bearer authentication
+AuthenticationScheme = "Bearer"
+
+TokenValidationParameters   : Contains a set of parameters that are used by a SecurityTokenHandler when 
+                              validating a Tokens.SecurityToken
+
+-> configure the token (8:00)
+
+TokenValidationParameters
+
+ValidateIssuer          = true       
+ValidateAudience        = true
+ValidateLifetime        = true
+ValidateIssuerSigninKey = true
+ValidIssuer             = Configuration["Jwt:Issuer"]
+ValidAudience           = Configuration["Jwt:Issuer"]
+IssuerSigningKey        =  new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+
+
+-- UsersController.cs --
+
+GenerateJSONWebToken():
+
+-> call the GenerateJSONWebToken() in the Login() method
+
+-> create GenerateJSONWebToken() method
+
+ create a securityKey :  
+-> _confir["Jwt:Key"]   : go to the appsettings.json, find the "Jwt" and take the "Key"
+-> convert it to bytes  : Encoding.UTF8.GetBytes(_conf["Jwt:Key"]
+-> put it in a new obj  : new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_conf["Jwt:Key"]))
+
+-> Hash the securityKey : new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);       
+-> create new List of Claims : {
+                                    .Sub -> user.Email
+                                    .Jti -> Guid.NewGuid().ToString()
+                                    .NameIdentifier -> user.Id
+                                }
+
+-> get the a list of roles from user : _userManager.GetRolesAsync(user);
+-> select a role from the list and add it to claims : 
+claims.AddRange(roles.Select(r => new Claim(ClaimsIdentity.DefaultNameClaimType, r)));  // ???? 
+-> create a new JwtSecurityToken    : var token
+-> return the token                 : return new JwtSecurityTokenHandler().WriteToken(token);
+
+
+40. Setup Controller and Action Authorizations
+
+-- AuthorsController.cs --
+
+-> GetAuthor, GetAuthor : [AllowAnonymous]             
+-> Create               : [Authorize(Roles ="Administrator")]              
+-> Update               : [Authorize(Roles ="Administrator, Customer")]
+-> Delete               : [Authorize(Roles ="Customer")]
+
+get the token : POST -> https://localhost:5001/api/users
+
+Test all the Methods:
+-> go to the Authorization tab : https://localhost:5001/api/Login
+-> select the BearerToken, paste the Token taken from https://localhost:5001/api/users
+-> run the link for every methods : Create, Update, Delete

@@ -1,0 +1,53 @@
+﻿18. Setup Repository and Service
+
+-> create : 	IAuthorRepository.cs
+				IBookRepository.cs
+				IRepositoryBase.cs	(FindAll, FindById, Create, Update, Delete, Save)
+
+-- AuthorRepository.cs --
+
+-> implement the methods: FindAll, FindById, Create, Update, Delete, Save
+
+
+20. Setup API Controller
+
+-> create API AuthorsController.cs
+-> include AuthorRepository, BookRepository in the Starup.cs
+-> create AuthorsController.cs: create constructor (IAuthorRepository, ILoggerService, IMapper)
+								implement Save(), Create(), Delete(), Update(), FindAll(), FindById()
+-> add documentation to the API
+
+
+21. Setup GET Endpoints
+
+-> create the constructor with the 3 Dependency Injections
+-> use Try, Catch blocks
+-> GetAuthors()		: get authors 
+					  map the authors to the DTO
+					  return OK(authorsDTO) 
+-> GetAuthor()		: get author
+					  map the author to the DTO
+					  return ok(authorDTO)
+-> InternalError()	
+-> add _Logger 
+-> add the documentation for each HTTP method
+-> add StatusCode to the Methods so we can see it on the Swagger
+
+
+22. Setup Creat Endpoint
+
+Create new AuthorDTO class	: DTOs -> AuthorDTO -> AuthorCreateDTO (FirstName, LastName, Bio)
+Map the new class DTOCreate : Mapping -> Maps.cs 
+
+-- AuthorsController.cs --
+
+-> implement Create()
+
+
+23. Setup Update Endpoint
+
+
+24. PUT vs PATCH
+
+
+25. Setup Detele

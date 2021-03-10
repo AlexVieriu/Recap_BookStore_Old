@@ -1,0 +1,163 @@
+﻿7. Tour of Project Struture and Files 
+
+wwwroot	-> static files 
+Aria	-> pages relating the identity : user managemant, log in register
+Data	-> store the data classes(Models)
+		-> handle migrations
+
+-- Startup.cs --
+
+app.UseStaticFiles() : used for Js, Css.. 
+
+ConfigureServices:
+-> remove RazorPages and add Controllers
+
+Configure:
+-> remove app.UseStaticFiles()
+-> remove MapRazorPages() and add MapControllers()
+
+->Controllers-> Index.cs(API Controller)
+
+Return OK("Hello World"); 
+(use PostMan)
+
+
+8. Why Razor and not API Template
+
+
+The major reason for this is the fact that choosing to include Authentication in the Razor template, 
+gave us quite a few things that would have required some manual configurations. In my book, 
+it would have required more to configure those things, than it required to delete a few files 
+and change the middlewares.
+
+-> Libraries required for Identity
+-> Libraries required for EntityFrameworkCore
+-> Middleware configurations for Entity Framework and Identity
+-> Required Data files (ApplicationDbContext and Migration Files)
+
+
+9. Configuring and Using Swagger UI
+
+Add Nuget Package:
+<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.6.1" />
+<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.6.1" />
+<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.6.1" />
+
+-- StartUp.cs --
+
+services.AddSwaggerGen()	: document generation	
+
+new	OpenApiInfo { }	-> this are the values that 
+
+
+->Project Properties -> Build -> XML documentation file
+
+-> after this we will get green notification in HomeController.cs on the methods :
+	-> "Missing XML" comment for publicly visible type of member "HomeController"
+	-> solution : add /// on the top of the each Function 
+	-> supress the warnings : ->Project Properties -> Build -> Supress warnings : 1591
+
+
+-> ConfigureServices
+
+services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new OpenApiInfo 
+                { 
+                    Title = "Book Store API",
+                    Version = "v1",
+                    Description = "This is an educational API for a Book Store"
+                });
+
+               var xfile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xpath = Path.Combine(AppContext.BaseDirectory, xfile);
+                c.IncludeXmlComments(xpath);
+            });
+
+
+-> instead of typing C:\Users\alexandru.vieriu\Desktop\New folder\BookStore\BookStore-API\BookStore-API.xml, which is static, 
+we can write it in the swagger Servicies, dynamic:  $"{Assembly.GetExecutingAssembly().GenName().Name}.xml";
+
+
+-> Configure
+
+
+app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Book Store API");
+                c.RoutePrefix = "";
+            });
+
+
+10. Configure Logging using NLog
+
+-> logging	: help you to debug it
+		: track when and where the actions were made
+
+Add NuGet Packages: -> NLog.Extensions.Logging
+
+-> create new file in the project: nlog.config
+
+-- nlog.config --
+
+<?xml version="1.0" encoding="utf-8" ?>
+<nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      autoReload="true"
+      internalLogLevel="Trace"
+      internalLogFile="C:\Users\alexandru.vieriu\Desktop\New folder\BookStore\logs\internallog.txt">
+
+  <targets>
+    <target name="logfile" xsi:type="File"
+            fileName="C:\Users\alexandru.vieriu\Desktop\New folder\BookStore\logs\${shortdate}_logfile.txt"
+            layout="${longdate} ${level:uppercase=true} ${message}"/>
+  </targets>
+
+  <rules>
+    <logger name="*" minlevel="Debug" writeTo="logfile" />
+  </rules>
+</nlog>
+
+
+
+Filename : create the path where the logs are send to 
+
+<target 
+	name="logfile" xsi:type="File"								
+	fileName="c:/Projects/BookStore-API/Project/logs/${shortdate}_logfile.txt"	: 
+	layout="${longdate} ${level:uppercase=true} ${message}"
+/>					
+
+Contracts	-> ILoggerServices.cs : LogDebug(), LogError(), LogInfo(), LogWarn()
+Services	-> LoggerServices.cs  : LogDebug(), LogError(), LogInfo(), LogWarn()
+
+private static ILogger logger = LogManager.GetCurrentClassLogger();
+
+logger.Debug(message);
+logger.Error(message);
+logger.Info(message);
+logger.Warn(message);
+
+-- Start.up --
+
+services.AddSingleton<ILoggerService, LoggerService>();
+
+-- HomeController.cs --
+
+-> creating the ctor so we can have Dependency Injections
+-> add Log Messages for test
+
+
+11. CORS Configuration (Cross Origin Resource Sharing)
+
+-> mechanism that gives rights to other users how are not on the same domain as us
+
+services.AddCors(o =>
+            {
+                o.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin()
+                                                            .AllowAnyMethod()
+                                                            .AllowAnyHeader());
+            });
+
+Add it to the pipeline:
+
+app.UseCors("CorsPolicy");
+

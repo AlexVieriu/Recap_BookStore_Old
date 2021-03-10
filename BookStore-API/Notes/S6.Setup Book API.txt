@@ -1,0 +1,25 @@
+﻿27. Setup Repository and Service
+
+Contracts -> IBookRepository 
+Servicies -> BookRepository
+
+-> Create(), FindAll(), FindById(), isExists(), Save(), Update()	
+
+-> configure servicies;
+
+
+28. Setup API Controller
+
+-> Controllers -> BooksController.cs
+-> create the constructor
+
+
+29. Setup Get Endpoints
+
+30. Setup CREATE Endpoint
+
+31.Setup Update Endpoint
+
+32. Book Update DTO
+
+33. Setup Delete

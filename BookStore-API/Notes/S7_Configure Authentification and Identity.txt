@@ -1,0 +1,105 @@
+﻿35.Scaffold Identity Tables to Existing Database
+
+-> update the DB with the Identity Tables 
+
+
+36. Seed Test Users and Roles
+
+Creating default:	users -> admin, Customer1, Customer2
+					roles -> Customer, Administrator
+					
+-> Data -> SeedData.cs : Seed()
+						 SeedUsers()
+						 SeedRoles()
+				
+-- StartUp.cs -- 
+
+-> configure	: ConfigureServices()
+				: Configure()
+
+select * from AspNetRoles
+select * from AspNetUserRoles
+select * from AspNetUsers
+
+
+37. Setup Users Controller
+
+-> Create class UserDTO (Username, Password)
+
+-> Controllers -> UsersController.cs :  
+- ctor							-> 4 paramenters						
+- Login()						-> PasswordSignInAsync(), FindByNameAsync()
+- GetControllerActionNames()	
+- InternalError()	
+- GenerateJSONWebToken()		-> implement in lecture 39
+
+-> de testat PasswordSignInAsync(username, password, false, true) // lockonFailed = true
+
+
+38. JWT(JSON Web Token)
+
+https://jwt.io/
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.
+SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+Header : 
+{
+	"..." : "..."
+	"..." : "..."
+}
+
+Payload:
+{
+	"..." : "..."
+	"..." : "..."
+}
+
+Verify Signature:
+{
+	"..." : "..."
+	"..." : "..."
+}
+
+
+39. Setup JSON Web Tokens (JWT) Authentication
+
+-> config the JWT in appsettings.json
+
+Add a NugetPackage: jwtbearer
+
+-- UrdersController.cs --
+
+GenerateJSONWebToken():
+
+-> var securityKey : take the GUID "Key" from "Jwt" (appsettings.json), convert it into Bytes
+					 and put it in a new SymmetricSecurityKey object
+-> var credentials : create a new SigningCredentials object that hash the securityKey(HmacSha256)
+-> get the a list of roles from user 
+-> select a role from the list and add it to claims
+-> create a new JwtSecurityToken object
+-> return the token 
+
+
+-- StartUp.cs -- 
+
+-> set the configuration
+
+ValidateIssuer                 
+ValidateAudience        
+ValidateLifetime        
+ValidateIssuerSigninKey 
+ValidIssuer             
+ValidAudience           
+IssuerSigningKey
+
+40. Setup Controller and Action Authorizations
+
+-> GetAuthor, GetAuthor : Allow anyone           
+-> Create               : "Administrator"            
+-> Update               : "Administrator, Customer"
+-> Delete               : "Customer"
+
+Test the requests
+

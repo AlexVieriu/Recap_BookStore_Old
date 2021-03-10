@@ -1,0 +1,185 @@
+﻿18. Setup Repository and Service
+
+-> Contracts	-> IRepository.cs		(FindAll, FindById, Create, Update, Delete, Save)	: base functionality
+				-> IAuthorService.cs	(we create it so if later we want to add additional functionality we can)
+-> Servicies	-> AuthorRepository.cs	(FindAll, FindById, Create, Update, Delete, Save)
+
+Task<IList<T>> FindAll();
+Task<T> FindById(int id);
+Task<bool> isExists(int id);
+Task<bool> Create(T entity);
+Task<bool> Update(T entity);
+Task<bool> Delete(T entity);
+Task<bool> Save();
+
+-> the interfaces for Book and Author are created in case we want to add 
+specific functionality to them that are not in the BaseClass
+
+
+-> Save() 
+	_db.SaveChangesAsync() : return the number of state entries written to the database.
+
+-> Create(Book entity)
+	_db.Books.AddAsync(entity) : -> Begins tracking the given entity, and any other reachable entities 
+								 that are not already being tracked, that they will be inserted into 
+								 the database when EntityFrameworkCore.DbContext.SaveChanges is called
+								 -> This method is async only to allow special value generators
+								 -> For all other cases the non async method should be used.
+
+-> Delete(Book entity)
+	 _db.Books.Remove(entity) : Begins tracking the given entity in the EntityFrameworkCore.EntityState.Deleted
+								state such that it will be removed from the database when 
+								EntityFrameworkCore.DbContext.SaveChanges is called.
+
+-> FindAll()
+	_db.Books.ToListAsync()	  : Asynchronously creates a System.Collections.Generic.List`1 from an 
+								System.Linq.IQueryable`1 by enumerating it asynchronously.
+
+-> FindById(int id)	
+	db.Books.FindAsync(id)	  :	Finds an entity with the given primary key values. If an entity with the given
+								primary key values is being tracked by the context, then it is returned immediately
+								without making a request to the database. Otherwise, a query is made to the database
+								for an entity with the given primary key values and this entity, if found, is
+								attached to the context and returned. If no entity is found, then null is returned.
+
+-> isExists(int id)
+	_db.Books.AnyAsync(q => q.Id== id) :  is there any book with the property Id == the value coming 
+										  in through this call and then return the his value
+
+-> Update(Book entity)
+	 _db.Books.Update(entity);
+
+
+-- AuthorRepository.cs --
+
+-> create contructor so we can access the data: ApplicationDbContext
+-> create the methods: FindAll, FindById, Create, Update, Delete, Save
+
+SaveChangeAsync():	-> Saves all changes made in this context to the database.
+					-> This method will automatically call Microsoft.EntityFrameworkCore.ChangeTracking.ChangeTracker.DetectChanges
+					to discover any changes to entity instances before saving to the underlying database
+					-> return the number of state entries written to the database.
+ToListAsync()	:	-> return a list of the specified objects
+FindAsync()		:	-> 	Finds an entity with the given primary key values. If an entity with the given primary key values 
+					is being tracked by the context, then it is returned immediatelywithout making a request to the database. 
+					Otherwise, a query is made to the databasefor an entity with the given primary key values and this entity, 
+					if found, isattached to the context and returned. If no entity is found, then null is returned.
+AddAsync()		:	
+Update()		:
+Remove()		:
+
+
+19. Scoped vs Singleton vs Transient
+
+
+Singleton	: Caching Services, Global Configuration, Business Rules, HttpClients 
+			  Persisting state that's useful for the runtime of the application
+
+Scoped		: Persisting state throughtout application per request
+
+Transient	: Data Access, File Access
+			  Services that should dispose of their state
+			  When you need a fresh instance of an object every single time
+
+https://www.youtube.com/watch?v=01C8selSVCY&ab_channel=RawCoding (4:05)
+
+
+20. Setup API Controller
+
+-- StartUp.cs -- 
+
+servicies.AddScoped<IAuthorRepository, AuthorRepository>();
+
+Controller -> AuthorsController.cs 
+
+-> create a constructor passing a param of Type IAuthorRepository, so we can have access to the class
+AuthorRepository, that has all the methods(FindAll, FindById, Create, Update, Delete, Save) with all the 
+data colected from the DB
+-> pass param logger for the Logger Messages 
+
+public AuthorsController( IAuthorRepository authorRepository, 
+						  ILoggerService logger,
+						  IMapper mapper
+						){}
+
+-> in AuthorRepository we have a contructor that access all the data from DB : ApplicationDbContext db
+
+
+21. Setup GET Endpoints
+
+<IActionResult> : we have more to return then ActionResult
+
+-> we are not interaction directly with our Data classes, but with our DTOs classes
+-> the controller talks to the DTOs, automapper will Map between Data and DTOs
+-> our repository will call the Data object and then we will map it to the DTOs(Author.cs-> AuthorDTO.cs)
+and return the DTOs object that is calling the API
+
+-> use Try, Catch
+[HttpPost]
+-> GetAuthors() :	-> get the authors	
+					-> map the Author to the AuthorDTO
+					-> return Ok(response);		
+[HttpPost({"id"})]					
+-> GetAuthor()	:
+-> add _Logger 
+-> add the documentation for each HTTP method
+-> add StatusCode to the Methods so we can see it on the Swagger
+
+
+22. Setup CREATE Endpoint
+
+Create new AuthorDTO class	: DTOs -> AuthorDTO -> AuthorCreateDTO (FirstName, LastName, Bio)
+Map the new class DTOCreate : Mapping -> Maps.cs -> CreateMap<Author, AuthorCreateDTO>().ReverseMap();
+            
+-- AuthorsController.cs --
+
+-> Create()
+
+ModelState: tracking the validation status of the data
+
+if(ModelState.IsValid == false){} -> check if the conditions created in the class ([Required], .....)
+									 are met, then ...  
+
+
+23. Setup UPDATE Endpoint
+
+-> DTOs -> AuthorDTO -> AuthorUpdateDTO
+-> Mapping -> Maps.cs -> CreateMap<Author, AuthorUpdateDTO>().ReverseMap();
+
+-- AuthorsController.cs --
+
+->  Update(int id, [FromBody] AuthorUpdateDTO authorDTO)
+
+
+24. PUT vs PATCH
+
+ https://rapidapi.com/blog/put-vs-patch/
+
+ -> if we have a request https://domain.com/house/1
+ {
+	"front_patio": true,
+	"back_patio": true,
+	"windows": 12,
+	"doors": 4,
+	"Balcony": false
+}
+
+-> and we only send :
+{
+	"doors": 5
+}
+
+-> PUT request overwrites everything.
+-> PATCH request overwrites only that field
+
+Note: calling HTTP PATCH on a resource that doesn’t exist is bound to fail and no resource will be created
+
+
+25. Setup DELETE EndPoint
+
+Contracts -> IRepositoryBase.cs : Task<bool> isExists(int id);
+Services -> AuthorRepository.cs : Task<bool> isExists(int id);
+
+-- AuthorsController.cs --
+
+-> Delete()

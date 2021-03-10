@@ -1,0 +1,59 @@
+﻿27. Setup Repository and Service 
+
+Contracts -> IBookRepository 
+Servicies -> BookRepository
+
+Task<IList<T>> FindAll();
+Task<T> FindById(int id);
+Task<bool> isExists(int id);
+Task<bool> Create(T entity);
+Task<bool> Update(T entity);
+Task<bool> Delete(T entity);
+Task<bool> Save();
+
+-> Create(), FindAll(), FindById(), isExists(), Save(), Update()	
+
+-> configure the BookRepository
+
+-- StartUp.cs --
+
+services.AddScoped<IBookRepository, BookRepository>();
+
+
+28. Setup API Controller
+
+-> Controllers -> BooksController.cs
+
+
+29. Setup GET Endpoints
+
+[HttpGet]
+-> GetBooks()	:	-> call method GetControllerActionNames() that return the Controller and ActionName
+					-> FindAll books and put it in a object
+					-> map the object <Book> and map it to the <BookDTO> object
+					-> return OK() method with the <BookDTO> object
+
+[HttpGet]
+-> GetBook()	
+
+
+
+[HttpPost]
+-> Create([FromBody] BookCreateDTO bookDTO)
+
+[HttpPut]
+-> Update(int id, [FromBody] BookUpdateDTO bookDTO)
+{
+	->		 id<1 || bookDTO == null || id != bookDTO.Id ??
+	-> _bookRepository.isExists(id);
+			isExists == false ?
+	-> ModelState.IsValid == false ?
+	-> _bookRepository.Update(book)
+			isSuccess == false ?	
+}
+
+[HttpDelete]
+
+
+
+For logs: https://baremetalsoft.com/baretail/

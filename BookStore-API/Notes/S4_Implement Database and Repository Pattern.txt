@@ -1,0 +1,27 @@
+﻿13. Create DataBase in SQL Server
+
+-> Tables:  Authors(Id, Firstname(50), LastName(50), Bio(MAX)), 
+			Books (Id, Title, Year, ISBN, Summary, Image, Price, AuthorId) (with FOREIGN KEY)
+
+
+14. Implement Data Classes and Entity Framework
+
+-> configure the appsettings.json
+-> configure ApplicationDbContext.cs
+-> create Book.cs, Author.cs (with List<Book>, List<Author>)
+
+
+16. Setup AutoMapper and DTOs
+
+-> we use mapping so we don't interact directly with the DB classes
+-> get NugetPackages for mapping
+-> put mapper in the ConfigureServicies
+
+-> create Mapper folder : Mappings
+-> create Mapper.cs
+
+-> create DTO folder : DTOs
+-> create DTO classes : AuthorDTO.cs(Id, Firstname, LastName, Bio)
+						BookDTO.cs	(Id, Title, Year, ISBN, Summary, Image, Price, AuthorId)
+
+
