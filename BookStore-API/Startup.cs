@@ -1,9 +1,17 @@
+using BookStore_API.Contracts;
+using BookStore_API.Data;
+using BookStore_API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System;
+using System.IO;
+using System.Reflection;
 
 namespace BookStore_API
 {
@@ -19,10 +27,34 @@ namespace BookStore_API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // configuration for entity Framework
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection")));            
+
+            services.AddDefaultIdentity<IdentityUser>()
+                    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddCors(o =>
+            {
+                o.AddPolicy("CorsPolicy",builder => builder.AllowAnyOrigin()
+                                                           .AllowAnyHeader()
+                                                           .AllowAnyMethod());
+            });
+
+
+            services.AddSingleton<ILoggerService, LoggerService>();
+
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BookStore_API", Version = "v1" });
+
+                // C:\Users\alexandru.vieriu\Desktop\Recap_BookStore\BookStore-API\BookStore-API.xml
+                var xfile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xpath = Path.Combine(AppContext.BaseDirectory, xfile);
+                c.IncludeXmlComments(xpath);
             });
         }
 
@@ -37,9 +69,11 @@ namespace BookStore_API
             }
 
             app.UseHttpsRedirection();
+            app.UseCors("CorsPolicy");
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

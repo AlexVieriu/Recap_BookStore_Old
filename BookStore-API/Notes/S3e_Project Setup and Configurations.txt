@@ -1,13 +1,19 @@
 ﻿7. Tour of Project Struture and Files 
 
+-- Creating a Web app project --
+
 wwwroot	-> static files 
 Aria	-> pages relating the identity : user managemant, log in register
 Data	-> store the data classes(Models)
 		-> handle migrations
 
+
 -- Startup.cs --
 
 app.UseStaticFiles() : used for Js, Css.. 
+
+
+--------------------Creating a Web app project------------------------------
 
 ConfigureServices:
 -> remove RazorPages and add Controllers
@@ -16,20 +22,81 @@ Configure:
 -> remove app.UseStaticFiles()
 -> remove MapRazorPages() and add MapControllers()
 
+-------------------- Creating a API project --------------------------------
+
+-- appsettings.json --
+-> add:  "DefaultConnection": "Server=ALEXVIERIU\\VIERIUALEXANDRU; Database = BookStore_Recap; Trusted_Connection = True"
+
+ConfigureServices:
+->  // configuration for entity Framework
+services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(
+        Configuration.GetConnectionString("DefaultConnection")));
+
+Configure:
+-> remove app.UseStaticFiles()
+-> remove MapRazorPages() and add MapControllers()
+
+----------------------------------------------------------------------------
+
 ->Controllers-> Index.cs(API Controller)
 
 Return OK("Hello World"); 
 (use PostMan)
 
 
+Dictionary:
+
+-- NuGets Packages --
+
+Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore : 
+-> ASP.NET Core middleware for Entity Framework Core error pages. 
+Use this middleware to detect and diagnose errors with Entity Framework Core migrations.
+
+Microsoft.AspNetCore.Identity.EntityFrameworkCore:
+-> ASP.NET Core Identity provider that uses Entity Framework Core.
+
+Microsoft.AspNetCore.Identity.UI:
+-> ASP.NET Core Identity UI is the default Razor Pages built-in UI for the ASP.NET Core Identity framework.
+
+Microsoft.EntityFrameworkCore.Tools:
+-> Entity Framework Core Tools for the NuGet Package Manager Console in Visual Studio.
+
+Microsoft.EntityFrameworkCore.SqlServer:
+-> 
+
+-- Data -> ApplicationDbContext.cs --
+
+IdentityDbContext
+DbContextOptions
+
+DbContextOptions:
+-> The options to be used by a Microsoft.EntityFrameworkCore.DbContext. You normally
+override Microsoft.EntityFrameworkCore.DbContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)
+or use a Microsoft.EntityFrameworkCore.DbContextOptionsBuilder`1 to create instances
+of this class and it is not designed to be directly constructed in your application
+code.
+
+IdentityDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
+-> Base class for the Entity Framework database context used for identity.
+
+public class IdentityDbContext<TUser, TRole, TKey> : 
+IdentityDbContext<TUser, TRole, TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, 
+IdentityUserLogin<TKey>, 
+IdentityRoleClaim<TKey>, 
+IdentityUserToken<TKey>>
+        where TUser : IdentityUser<TKey>
+        where TRole : IdentityRole<TKey>
+        where TKey : IEquatable<TKey>
+
+
 8. Why Razor and not API Template
 
 
 The major reason for this is the fact that choosing to include Authentication in the Razor template, 
-gave us quite a few things that would have required some manual configurations. In my book, 
-it would have required more to configure those things, than it required to delete a few files 
-and change the middlewares.
+gave us quite a few things that would have required some manual configurations. 
 
+Some of these things are:
 -> Libraries required for Identity
 -> Libraries required for EntityFrameworkCore
 -> Middleware configurations for Entity Framework and Identity
@@ -38,17 +105,7 @@ and change the middlewares.
 
 9. Configuring and Using Swagger UI
 
-Add Nuget Package:
-<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.6.1" />
-<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.6.1" />
-<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.6.1" />
-
 -- StartUp.cs --
-
-services.AddSwaggerGen()	: document generation	
-
-new	OpenApiInfo { }	-> this are the values that 
-
 
 ->Project Properties -> Build -> XML documentation file
 
@@ -60,37 +117,21 @@ new	OpenApiInfo { }	-> this are the values that
 
 -> ConfigureServices
 
-services.AddSwaggerGen(c => {
-                c.SwaggerDoc("v1", new OpenApiInfo 
-                { 
-                    Title = "Book Store API",
-                    Version = "v1",
-                    Description = "This is an educational API for a Book Store"
-                });
-
-               var xfile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xpath = Path.Combine(AppContext.BaseDirectory, xfile);
-                c.IncludeXmlComments(xpath);
-            });
+Swagger Documentation:
+var xfile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+var xpath = Path.Combine(AppContext.BaseDirectory, xfile);
+c.IncludeXmlComments(xpath);
 
 
--> instead of typing C:\Users\alexandru.vieriu\Desktop\New folder\BookStore\BookStore-API\BookStore-API.xml, which is static, 
-we can write it in the swagger Servicies, dynamic:  $"{Assembly.GetExecutingAssembly().GenName().Name}.xml";
-
-
--> Configure
-
-
-app.UseSwaggerUI(c => {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Book Store API");
-                c.RoutePrefix = "";
-            });
+-> instead of typing C:\Users\alexandru.vieriu\Desktop\New folder\BookStore\BookStore-API\BookStore-API.xml, 
+which is static, we can write it in the swagger Servicies, dynamic:   
+$"{Assembly.GetExecutingAssembly().GenName().Name}.xml";
 
 
 10. Configure Logging using NLog
 
 -> logging	: help you to debug it
-		: track when and where the actions were made
+		    : track when and where the actions were made
 
 Add NuGet Packages: -> NLog.Extensions.Logging
 
@@ -116,20 +157,12 @@ Add NuGet Packages: -> NLog.Extensions.Logging
   </rules>
 </nlog>
 
-
-
-Filename : create the path where the logs are send to 
-
-<target 
-	name="logfile" xsi:type="File"								
-	fileName="c:/Projects/BookStore-API/Project/logs/${shortdate}_logfile.txt"	: 
-	layout="${longdate} ${level:uppercase=true} ${message}"
-/>					
-
+				
 Contracts	-> ILoggerServices.cs : LogDebug(), LogError(), LogInfo(), LogWarn()
 Services	-> LoggerServices.cs  : LogDebug(), LogError(), LogInfo(), LogWarn()
 
-private static ILogger logger = LogManager.GetCurrentClassLogger();
+private static ILogger logger = LogManager.GetCurrentClassLogger();  -> Gets the logger with the full name of the current 
+                                                                        class, so namespace and class name.
 
 logger.Debug(message);
 logger.Error(message);

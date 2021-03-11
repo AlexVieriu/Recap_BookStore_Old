@@ -28,25 +28,16 @@ files and change the middlewares.
 
 9. Configuring and Using Swagger UI
 
--> install the NugetPackage for Swagger : Swagger, SwaggerGen, SwaggerUI
--> set ConfigureServices for Swagger
--> set Configure for Swagger
-
--> run the app ( why crashed?):  
-
--> delete the HomeController 
--> create a HomeController with read/write actions
-
--> include XML documentation
+-> active the XML documentation file
 -> supress warnings
 -> get the path where our xml documentation is (StartUp.cs)
--> ConfigureServicies: configure the xml documentation for Swagger
+
+-- ConfigureServicies --
+-> configure the xml documentation for Swagger
 
 var xfile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xpath = Path.Combine(AppContext.BaseDirectory, xfile);
                 c.IncludeXmlComments(xpath);
-
--> Configure the SwaggerUI so when we run it we do directly to UI : /swagger
 
 
 10. Configure Logging using NLog
@@ -79,7 +70,7 @@ var xfile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 -> view the logs
 
 -> create 2 files : Contracts	-> ILoggerService.cs :  LogDebug(), LogError(), LogInfo(), LogWarn()
-		    Servicies	-> LoggerService.cs  :  LogDebug(), LogError(), LogInfo(), LogWarn()
+		            Servicies	-> LoggerService.cs  :  LogDebug(), LogError(), LogInfo(), LogWarn()
 
 -> add ILoggerService.cs, LoggerService.cs to ConfigureServices
 
