@@ -15,13 +15,14 @@
 
 -> we use mapping so we don't interact directly with the DB classes
 -> get NugetPackages for mapping
--> put mapper in the ConfigureServicies
 
 -> create Mapper folder : Mappings
 -> create Mapper.cs
+
+-> put mapper in the ConfigureServicies
 
 -> create DTO folder : DTOs
 -> create DTO classes : AuthorDTO.cs(Id, Firstname, LastName, Bio)
 						BookDTO.cs	(Id, Title, Year, ISBN, Summary, Image, Price, AuthorId)
 
-
+-> Map the AuthorDTO, BookDTO with Author, Book classes

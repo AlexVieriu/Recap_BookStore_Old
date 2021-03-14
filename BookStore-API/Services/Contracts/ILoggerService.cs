@@ -1,4 +1,4 @@
-﻿namespace BookStore_API.Contracts
+﻿namespace BookStore_API.Services.Contracts
 {
     public interface ILoggerService
     {

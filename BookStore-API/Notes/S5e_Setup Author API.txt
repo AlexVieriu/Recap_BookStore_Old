@@ -69,6 +69,27 @@ Update()		:
 Remove()		:
 
 
+More Extention Methods:
+
+https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.entityframeworkqueryableextensions?view=efcore-5.0
+
+AllAsync<TSource>(IQueryable<TSource>, Expression<Func<TSource,Boolean>>, CancellationToken)
+-> Asynchronously determines whether all the elements of a sequence satisfy a condition
+
+AsAsyncEnumerable<TSource>(IQueryable<TSource>)
+-> Returns an IAsyncEnumerable<T> which can be enumerated asynchronously.
+
+AverageAsync(IQueryable<Decimal>, CancellationToken)
+-> Asynchronously computes the average of a sequence of values.
+
+AverageAsync<TSource>(IQueryable<TSource>, Expression<Func<TSource,Decimal>>, CancellationToken)
+-> Asynchronously computes the average of a sequence of values that is obtained by invoking a projection 
+function on each element of the input sequence.
+....... 
+
+
+
+
 19. Scoped vs Singleton vs Transient
 
 

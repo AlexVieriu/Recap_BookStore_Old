@@ -2,7 +2,7 @@
 
 -> Scaffold : the proccess for what we autogenerate things
 -> search : Package Manager Console
-			-> update-database (will create tables for the autentification using EntityFramework)
+			->   vv  (will create tables for the autentification using EntityFramework)
 
 AspNetRoles
 AspNetUsers

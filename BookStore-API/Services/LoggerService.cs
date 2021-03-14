@@ -1,4 +1,4 @@
-﻿using BookStore_API.Contracts;
+﻿using BookStore_API.Services.Contracts;
 using NLog;
 
 namespace BookStore_API.Services

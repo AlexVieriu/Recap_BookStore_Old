@@ -1,6 +1,7 @@
-using BookStore_API.Contracts;
 using BookStore_API.Data;
+using BookStore_API.Mappings;
 using BookStore_API.Services;
+using BookStore_API.Services.Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -24,32 +25,43 @@ namespace BookStore_API
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        // This method gets called by the runtime.Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // configuration for entity Framework
+            //configuration for entity Framework
+
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));            
+                 options.UseSqlServer(
+                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDefaultIdentity<IdentityUser>()
                     .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddCors(o =>
             {
-                o.AddPolicy("CorsPolicy",builder => builder.AllowAnyOrigin()
-                                                           .AllowAnyHeader()
-                                                           .AllowAnyMethod());
+                o.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin()
+                                                            .AllowAnyHeader()
+                                                            .AllowAnyMethod());
             });
+
+            services.AddAutoMapper(typeof(Maps));
 
 
             services.AddSingleton<ILoggerService, LoggerService>();
+
+            services.AddScoped<IAuthorRepository, AuthorRepository>();
+            services.AddScoped<IBookRepository, BookRepository>();
 
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "BookStore_API", Version = "v1" });
+                c.SwaggerDoc("v1",
+                    new OpenApiInfo
+                    {
+                        Title = "BookStore_API",
+                        Version = "v1",
+                    });
 
                 // C:\Users\alexandru.vieriu\Desktop\Recap_BookStore\BookStore-API\BookStore-API.xml
                 var xfile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";

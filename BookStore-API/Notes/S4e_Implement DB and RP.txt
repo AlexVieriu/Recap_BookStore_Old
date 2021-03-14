@@ -1,20 +1,37 @@
 ﻿13. Create Database in SQL Server
--- appsetting.json --
-
-"ConnectionStrings": {
-    "DefaultConnection": "Server=DESKTOP-TJTCLO2;Database=BookStore;Trusted_Connection=True;"
-  }
 
 Create Tables:
-Tables:  Authors (Id, Firstname(50), LastName(50), Bio(MAX)), 
+Tables:  Authors (Id, Firstname(50), LastName(50), Bio(150)), 
 		 Books   (Id, Title, Year, ISBN, Summary, Image, Price, AuthorId) (with FOREIGN KEY)
 
 
 14. Implement Data Classes and Entity Framework
 
-Create 2 Classes: 
+-- appsetting.json --
+
+"ConnectionStrings": {
+    "DefaultConnection": "Server = DESKTOP-TJTCLO2; Database = BookStore;Trusted_Connection = True;"
+  }
+
+
+Create 2 partial Classes: 
 -> Data -> Book.cs	: Id, Firstname, LastName, Bio
 		-> Author.cs: Id, Title, Year, ISBN, Summary, Image, Price, AuthorId
+
+-- ApplicationDbContext.cs --
+
+-> i'm looking for the table Authors and i'm using the class Author
+
+public DbSet<Author> Authors { get; set; }
+public DbSet<Book> Books { get; set; }
+
+
+Dictionary:
+
+[Table("Authors")] : Initializes a new instance of the System.ComponentModel.DataAnnotations.Schema.TableAttribute
+					 class using the specified name of the table.
+					 Name of Table that the class is mapped to
+
 
 Partial Class : https://www.geeksforgeeks.org/partial-classes-in-c-sharp/
 -> provides a special ability to implement the functionality of a single class into multiple files
@@ -38,14 +55,6 @@ Advantages :
 -> you can also maintain your application in an efficient manner by compressing large classes into small ones.
 
 
--- ApplicationDbContext.cs --
-
--> i'm looking for the table Authors and i'm using the class Author
-
-public DbSet<Author> Authors { get; set; }
-public DbSet<Book> Books { get; set; }
-
-
 15. Scaffold-DbContext Command
 
 Manually creating the classes
@@ -55,18 +64,25 @@ Scaffold-DbContext [-Connection] [-Provider] [-OutputDir] [-Context] [-Schemas>]
                     [-DataAnnotations] [-Force] [-Project] [-StartupProject] [<CommonParameters>]
 
 In this specific context ,the command would have been:
-PM> Scaffold-DbContext "Server=.\SQLExpress;Database=BookStore;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Data
+PM> Scaffold-DbContext "Server=.\SQLExpress;=BookStore;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Data
+
 
 16. Setup AutoMapper and DTOs(Data transfer Objects)
 
 -> we use mapping so we don't interact directly with the DB classes
--> get NugetPackages for mapping
+-> get NugetPackages for mapping :	AutoMapper
+									AutoMapper.Extensions.Microsoft.DependencyInjection
+
+-> create DTO folder	: DTOs
+-> create DTO classes	: AuthorDTO.cs(Id, Firstname, LastName, Bio)
+						  BookDTO.cs(Id, Title, Year, ISBN, Summary, Image, Price, AuthorId)
+
+-> create Mappings/Mapper.cs
+	 CreateMap<Author, AuthorDTO>().ReverseMap();
+     CreateMap<Book, BookDTO>().ReverseMap();
+
 -> put mapper in the ConfigureServicies
+	services.AddAutoMapper(typeof(Maps));
+	
 
--> create Mapper folder : Mappings
--> create Mapper.cs
-
--> create DTO folder : DTOs
--> create DTO classes : AuthorDTO.cs(Id, Firstname, LastName, Bio)
-						BookDTO.cs	(Id, Title, Year, ISBN, Summary, Image, Price, AuthorId)
 
