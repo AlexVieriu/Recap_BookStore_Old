@@ -1,8 +1,8 @@
 ﻿35. Scaffold Identity Tables to Existing Database
 
 -> Scaffold : the proccess for what we autogenerate things
--> search : Package Manager Console
-			->   vv  (will create tables for the autentification using EntityFramework)
+-> search   : Package Manager Console
+			  -> vv  (will create tables for the autentification using EntityFramework)
 
 AspNetRoles
 AspNetUsers

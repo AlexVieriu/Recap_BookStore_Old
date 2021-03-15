@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BookStore_API.Data.Migrations
 {
-    public partial class FirstMigrationIdentity : Migration
+    public partial class FirstMigrations : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -45,6 +45,8 @@ namespace BookStore_API.Data.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
+
+            
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
@@ -152,6 +154,7 @@ namespace BookStore_API.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -190,6 +193,7 @@ namespace BookStore_API.Data.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+           
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -214,6 +218,7 @@ namespace BookStore_API.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
         }
     }
 }
