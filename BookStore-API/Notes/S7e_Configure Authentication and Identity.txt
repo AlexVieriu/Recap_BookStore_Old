@@ -66,7 +66,7 @@ Dictionary:
 
 37. Setup Users Controller
 
--> DTOs : UserDTO (Username, Password)
+-> Create class UserDTO (Username, Password)
 -> config the JWT in appsettings.json : "Key",  "Issuer"
 
 -> Controllers -> UsersController.cs :
@@ -84,9 +84,10 @@ https://www.youtube.com/watch?v=TfarnVqnhX0&ab_channel=kudvenkat
 
 UserManager	 :  -> manage the user operations
                 -> provides the APIs for managing user in a persistence store.
-                -> is accepting a generic class, so we can put our custom class of users with details about the user
+                -> is accepting a generic class, so we can put our custom class of users with 
+                details about the user
 
--> Methods :-> CreateAsync
+-> Methods: -> CreateAsync
             -> DeleteAsync
             -> UpdateAsync 
             -> FindByNameAsync
@@ -94,12 +95,13 @@ UserManager	 :  -> manage the user operations
 SignInManager:  -> manage signIn, signOut, authentification stuff
                 -> provides the APIs for user sign in
 
--> Methods :    -> SignInAsync(IdentityUser user, bool isPersistent) 
-                -> SignOutAsync
-                -> IsSigneIn
-                -> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
-                    -> Attempts to sign in the specified userName and password combination as 
-                    an asynchronous operation.
+-> Methods: -> SignInAsync(IdentityUser user, bool isPersistent) 
+            -> SignOutAsync
+            -> IsSigneIn
+
+            -> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
+                -> Attempts to sign in the specified userName and password combination as 
+                an asynchronous operation.
 
 bool isPersistent: it is used to store Season cookie , Permanent cookie
 

@@ -1,4 +1,5 @@
 using BookStore_API.Data;
+using BookStore_API.DTOs.Log;
 using BookStore_API.Mappings;
 using BookStore_API.Services;
 using BookStore_API.Services.Contracts;
@@ -87,10 +88,8 @@ namespace BookStore_API
             app.UseHttpsRedirection();
             app.UseCors("CorsPolicy");
 
-
             app.UseRouting();
-
-            SeedData.Seed(userManager, roleManager).Wait();
+            SeedData.Seed(userManager, roleManager).Wait();                     
 
             app.UseAuthentication();
             app.UseAuthorization();

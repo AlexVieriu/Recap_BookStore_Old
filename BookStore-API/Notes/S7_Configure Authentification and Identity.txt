@@ -26,9 +26,12 @@ select * from AspNetUsers
 
 -> Create class UserDTO (Username, Password)
 
--> Controllers -> UsersController.cs :  
-- ctor							-> 4 paramenters						
-- Login()						-> PasswordSignInAsync(), FindByNameAsync()
+-> Controllers  -> UsersController.cs :  
+-> ctor			-> 4 paramenters						
+-> Login()		-> PasswordSignInAsync(), FindByNameAsync()
+				-> check if the user can LogIn	: _signInManager.PasswordSignInAsync(userName, userPasword, false, false);
+				-> search the User and return it: _userManager.FindByNameAsync(userName)
+
 - GetControllerActionNames()	
 - InternalError()	
 - GenerateJSONWebToken()		-> implement in lecture 39
@@ -69,7 +72,7 @@ Verify Signature:
 
 Add a NugetPackage: jwtbearer
 
--- UrdersController.cs --
+-- UsersController.cs --
 
 GenerateJSONWebToken():
 
