@@ -186,6 +186,7 @@ Add a NugetPackage: jwtbearer
 
 -- Startup.cs --
 
+AddAuthentication               : Registers services required by authentication services
 JwtBearerDefaults               : Default values used by bearer authentication
 AuthenticationScheme = "Bearer"
 
@@ -226,11 +227,51 @@ GenerateJSONWebToken():
                                 }
 
 -> get the a list of roles from user : _userManager.GetRolesAsync(user);
+
 -> select a role from the list and add it to claims : 
 claims.AddRange(roles.Select(r => new Claim(ClaimsIdentity.DefaultNameClaimType, r)));  // ???? 
+
 -> create a new JwtSecurityToken    : var token
+
 -> return the token                 : return new JwtSecurityTokenHandler().WriteToken(token);
 
+
+Dictionary:
+
+ValidateIssuer          : 
+https://stackoverflow.com/questions/55767757/validateissuer-option-in-openid-connect-authentication
+-> if you leave ValidateIssuer = false, then OIDC middleware will not try to validate the issuer tenant 
+and it would effectively mean that your application is open for anyone with a user in Azure AD.  
+
+ValidateAudience        = 
+ValidateLifetime        = 
+ValidateIssuerSigningKey = 
+ValidIssuer             = 
+
+
+-- JwtSecurityToken(overload) --
+
+JwtSecurityToken(string jwtEncodedString);
+JwtSecurityToken(JwtHeader header, JwtPayload payload);
+JwtSecurityToken(JwtHeader header, JwtPayload payload, string rawHeader, string rawPayload, string rawSignature);
+
+JwtSecurityToken(
+    string issuer = null, 
+    string audience = null, 
+    IEnumerable<Claim> claims = null, 
+    DateTime? notBefore = null, 
+    DateTime? expires = null, 
+    SigningCredentials signingCredentials = null);
+
+JwtSecurityToken(
+    JwtHeader header, 
+    JwtSecurityToken innerToken, 
+    string rawHeader, 
+    string rawEncryptedKey, 
+    string rawInitializationVector, 
+    string rawCiphertext, 
+    string rawAuthenticationTag);
+  
 
 40. Setup Controller and Action Authorizations
 

@@ -3,7 +3,14 @@ using BookStore_API.Services.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace BookStore_API.Controllers
@@ -15,14 +22,17 @@ namespace BookStore_API.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILoggerService _logger;
+        private readonly IConfiguration _config;
 
         public UsersController(SignInManager<IdentityUser> signInManager,
                               UserManager<IdentityUser> userManager,
-                              ILoggerService logger)
+                              ILoggerService logger,
+                              IConfiguration config)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
+            _config = config;
         }
 
         [HttpPost]
@@ -40,11 +50,12 @@ namespace BookStore_API.Controllers
                 _logger.LogInfo($"{location} : {userName} - Attempting to Login");
                 var result = await _signInManager.PasswordSignInAsync(userName, userPasword, false, false);
 
-                if(result.Succeeded)
+                if (result.Succeeded)
                 {
                     _logger.LogInfo($"{location} - Logged Successful");
                     var user = await _userManager.FindByNameAsync(userName);
-                    return Ok(user);
+                    var stringToken = GenerateJWT(user);
+                    return Ok(stringToken);
                 }
 
                 _logger.LogInfo($"{location} : {userName} - Unauthorized");
@@ -55,11 +66,55 @@ namespace BookStore_API.Controllers
             {
                 return InternalError(e, location);
             }
-
-
-           
         }
 
+        private async Task<string> GenerateJWT(IdentityUser user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            /*
+                user.id
+                user.UserName
+                GUID
+                user roles
+
+            */
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            claims.AddRange(roles.Select(r => new Claim(ClaimsIdentity.DefaultNameClaimType, r)));
+    
+            /*
+            string issuer = null, 
+            string audience = null, 
+            IEnumerable< Claim > claims = null, 
+            DateTime? notBefore = null, 
+            DateTime? expires = null, 
+            SigningCredentials signingCredentials = null
+
+            */
+
+            var token = new JwtSecurityToken(
+                _config["Jwt:Issuer"],
+                _config["Jwt:Issuer"],
+                claims,
+                null,
+                expires: DateTime.Now.AddMinutes(3),
+                signingCredentials : credentials
+                ); 
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return tokenString;
+
+        }
+        
 
         private string GetControllerActionName()
         {

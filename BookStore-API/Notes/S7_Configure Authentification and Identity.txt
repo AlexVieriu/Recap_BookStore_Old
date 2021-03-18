@@ -72,6 +72,19 @@ Verify Signature:
 
 Add a NugetPackage: jwtbearer
 
+-- StartUp.cs -- 
+
+-> set the configuration
+
+ValidateIssuer                 
+ValidateAudience        
+ValidateLifetime        
+ValidateIssuerSigninKey 
+ValidIssuer             
+ValidAudience           
+IssuerSigningKey
+
+
 -- UsersController.cs --
 
 GenerateJSONWebToken():
@@ -85,17 +98,6 @@ GenerateJSONWebToken():
 -> return the token 
 
 
--- StartUp.cs -- 
-
--> set the configuration
-
-ValidateIssuer                 
-ValidateAudience        
-ValidateLifetime        
-ValidateIssuerSigninKey 
-ValidIssuer             
-ValidAudience           
-IssuerSigningKey
 
 40. Setup Controller and Action Authorizations
 
