@@ -1,5 +1,6 @@
 ﻿using BookStore_API.DTOs.Log;
 using BookStore_API.Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +36,7 @@ namespace BookStore_API.Controllers
             _config = config;
         }
 
-        [HttpPost]
+        [HttpPost]        
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -54,7 +55,7 @@ namespace BookStore_API.Controllers
                 {
                     _logger.LogInfo($"{location} - Logged Successful");
                     var user = await _userManager.FindByNameAsync(userName);
-                    var stringToken = GenerateJWT(user);
+                    var stringToken = await GenerateJWT(user);
                     return Ok(stringToken);
                 }
 
@@ -78,7 +79,6 @@ namespace BookStore_API.Controllers
                 user.UserName
                 GUID
                 user roles
-
             */
             var claims = new List<Claim>
             {
@@ -89,7 +89,7 @@ namespace BookStore_API.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            claims.AddRange(roles.Select(r => new Claim(ClaimsIdentity.DefaultNameClaimType, r)));
+            claims.AddRange(roles.Select(r => new Claim(ClaimsIdentity.DefaultRoleClaimType, r)));
     
             /*
             string issuer = null, 
@@ -106,15 +106,14 @@ namespace BookStore_API.Controllers
                 _config["Jwt:Issuer"],
                 claims,
                 null,
-                expires: DateTime.Now.AddMinutes(3),
+                expires: DateTime.Now.AddMinutes(5),
                 signingCredentials : credentials
                 ); 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
             return tokenString;
 
-        }
-        
+        }        
 
         private string GetControllerActionName()
         {

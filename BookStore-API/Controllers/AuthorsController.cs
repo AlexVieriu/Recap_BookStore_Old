@@ -2,6 +2,7 @@
 using BookStore_API.Data;
 using BookStore_API.DTOs;
 using BookStore_API.Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -35,7 +36,8 @@ namespace BookStore_API.Controllers
         /// Get All Authors
         /// </summary>
         /// <returns>List of Authors</returns>
-        [HttpGet]
+        [HttpGet]  
+        [Authorize(Roles = "Administrator, Customer")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAuthors()
@@ -65,6 +67,7 @@ namespace BookStore_API.Controllers
         /// <param name="id"></param>
         /// <returns>An Author's record</returns>
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "Customer")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -104,6 +107,7 @@ namespace BookStore_API.Controllers
         /// <param name="authorCreateDTO"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize(Roles ="Administrator")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -151,6 +155,7 @@ namespace BookStore_API.Controllers
         /// <param name="authorUpdateDTO"></param>
         /// <returns>Returns the Author Updated</returns>
         [HttpPut("{id:int}")]
+        [Authorize(Roles ="Administrator")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -206,6 +211,7 @@ namespace BookStore_API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id:int}")]
+        [Authorize(Roles ="Administrator")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
