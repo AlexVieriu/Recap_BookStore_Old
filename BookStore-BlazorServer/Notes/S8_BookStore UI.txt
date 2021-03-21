@@ -1,0 +1,80 @@
+﻿42. Create and Understand Blazor Project Structure
+
+-- NavMenu.razor --
+
+-> add NavBars	: Login		, Register	, Authors	, Books
+-> add icons	: oi-globe	, oi-book	, oi-plus	, oi-list-rich	
+
+﻿44. Setup HTTP Client And Service Repositories
+
+-- BookStore_UI --
+
+Create folders:
+-> Contracts	: IBaseRepository
+-> Services		: BaseRepository
+-> Static		: EndPoints
+
+
+-- EndPoint.cs --
+-> create endpoints for : BaseUrl, AuthorUrl, BookUrl, LoginUrl, RegisterUrl
+
+-- IBaseRepository.cs --
+-> Get(), Get(), Create(), Update(), Delete()
+
+-- BaseRepository.cs --
+-> Get(), Get(), Create(), Update(), Delete()
+
+
+45. Setup User Registration API Endpoint
+
+-- BookStore-API --
+
+-> add validations to UserDTOs
+-> add route to Register , Login actions
+-> create Register action:
+	try:	-> declare IdentityUser() obj
+			-> create IdentityUser() using _userManager
+			-> add validation if the creation fail
+			-> return Ok();
+	catch:	-> InternalError()
+-> add documentation 
+
+
+
+46. Setup User Registration Form
+
+-- BookStore_UI --
+
+-> add RegisterEndpoint
+
+-> Models:	RegisterModel.cs	(UserName, Password, ConfirmedPassword)
+			LoginModel.cs		(UserName, Password)
+
+
+Create 2 classes: 
+
+IAuthenticationRepository.cs	: Register() 
+AuthenticationRepository.cs		: Register()
+
+-> create the Register() method
+
+
+-- Startup.cs --
+
+-> add AuthenticationRepository.cs , IAuthenticationRepository.cs
+
+
+-- Pages -> Users -> Register.razor--
+
+UI:
+-> add card : card-title 
+			  display msg if registration failed
+			  card-body  -> <EditForm>	-> 3 <div> : <label>, <InputText>, <ValidationMessage For="">
+										-> <button>
+										-> UserName, Password, ConfirmedPassword			 
+				
+
+@code: 
+-> declare RegisterModel
+-> declare a prop that know if the registration failed or not
+-> create method for ValidationSubmit: HandleRegistration()

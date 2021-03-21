@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace BookStore_UI.Servicies.Contracts
 {
-    public interface IBaseRepository<T> where T: class
+    public interface IBaseRepository<T> where T : class
     {
         Task<IList<T>> GetAll(string url);
         Task<T> GetbyId(string url, int id);

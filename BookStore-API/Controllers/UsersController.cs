@@ -1,6 +1,5 @@
 ﻿using BookStore_API.DTOs.Log;
 using BookStore_API.Services.Contracts;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -36,17 +35,63 @@ namespace BookStore_API.Controllers
             _config = config;
         }
 
-        [HttpPost]        
+        /// <summary>
+        /// Register Endpoint
+        /// </summary>
+        /// <param name="userDTO"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> LogIn([FromBody] UserDTO userDTO)
+        public async Task<IActionResult> Register([FromBody] UserDTO userDTO)
         {
             var location = GetControllerActionName();
             try
             {
                 var userName = userDTO.UserName;
-                var userPasword = userDTO.Password;
+                var userPassword = userDTO.UserPassword;
+
+                var newUser = new IdentityUser() { UserName = userName };
+
+                _logger.LogInfo($"Attempted to create {userName}");
+                var userCreated = await _userManager.CreateAsync(newUser);
+                
+                if(userCreated.Succeeded == false)
+                {
+                    foreach(var error in userCreated.Errors)
+                    {
+                        _logger.LogError($"{location} : {error.Code} - {error.Description}");
+                    }
+                    return StatusCode(500, $"The {userName} couldn't be saved");
+                }
+
+                return Ok("User Created");
+            }
+
+            catch (Exception e)
+            {
+                return InternalError(e, location);                
+            }
+        }
+
+        /// <summary>
+        /// Login Endpoint
+        /// </summary>
+        /// <param name="userDTO"></param>
+        /// <returns></returns>
+        [HttpPost]   
+        [Route("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Login([FromBody] UserDTO userDTO)
+        {
+            var location = GetControllerActionName();
+            try
+            {
+                var userName = userDTO.UserName;
+                var userPasword = userDTO.UserPassword;
 
                 _logger.LogInfo($"{location} : {userName} - Attempting to Login");
                 var result = await _signInManager.PasswordSignInAsync(userName, userPasword, false, false);
@@ -112,7 +157,6 @@ namespace BookStore_API.Controllers
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
             return tokenString;
-
         }        
 
         private string GetControllerActionName()

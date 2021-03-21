@@ -53,15 +53,15 @@ namespace BookStore_UI.Servicies
             var client = _client.CreateClient();
 
             HttpResponseMessage response = await client.SendAsync(request);
-            if(response.StatusCode == HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var list = JsonConvert.DeserializeObject<IList<T>>(content);
-                
+
                 return list;
             }
 
-            return null;    
+            return null;
         }
 
         public async Task<T> GetbyId(string url, int id)
@@ -71,7 +71,7 @@ namespace BookStore_UI.Servicies
             var client = _client.CreateClient();
 
             HttpResponseMessage response = await client.SendAsync(request);
-            if(response.StatusCode == HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
                 var content = await response.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<T>(content);
@@ -91,7 +91,7 @@ namespace BookStore_UI.Servicies
             var client = _client.CreateClient();
 
             HttpResponseMessage response = await client.SendAsync(request);
-            if(response.StatusCode == HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
                 var content = await response.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<T>(content);

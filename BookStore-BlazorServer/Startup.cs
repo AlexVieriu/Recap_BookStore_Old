@@ -1,3 +1,5 @@
+using BookStore_UI.Servicies;
+using BookStore_UI.Servicies.Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +22,11 @@ namespace BookStore_UI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
-            services.AddServerSideBlazor();            
+            services.AddServerSideBlazor();
+
+            services.AddHttpClient();
+
+            services.AddSingleton<IAuthentificationRepository, AuthentificationRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -30,7 +36,6 @@ namespace BookStore_UI
             {
                 app.UseDeveloperExceptionPage();
             }
-
             else
             {
                 app.UseExceptionHandler("/Error");
