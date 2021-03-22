@@ -73,8 +73,62 @@ UI:
 										-> <button>
 										-> UserName, Password, ConfirmedPassword			 
 				
-
 @code: 
 -> declare RegisterModel
 -> declare a prop that know if the registration failed or not
 -> create method for ValidationSubmit: HandleRegistration()
+
+
+47. Setup User Login - Extend Blazor Authentication Provider
+
+Static -> LoginUrl
+Models -> LoginModel.cs, TokenResponse.cs
+
+-> install LocalStorage, Tokens.JWT
+
+-- Startup.cs --
+-> add LocalStorage, JwtSecurityTokenHandler
+
+
+-- BookStore_UI.Servicies.Contracts -- 
+IAuthenticationRepository.cs : Register(), Login(), Logout()
+
+
+-- Provider -> ApiAuthenticationStateProvider.cs --
+
+-> GetAuthenticationStateAsync()
+-> LoggedIn()
+-> LoggedOut()
+
+-> override GetAuthenticationStateAsync()
+	try:	-> get the token and store it as string 
+			-> check if there is a token, if true, return an empty AuthenticationState object
+			-> read the JWT
+			-> check the expiry date, return an empty AuthenticationState object if expired
+			-> get the claims from token and build auth user object
+			-> return authenticated person
+	
+	catch:	-> return an empty AuthenticationState
+
+-> create : IList<Claim> ParseClaims(JwtSecurityToken tokenContent) 
+	-> get the Claims and put it in a List
+	-> add a new Claim to the List: (ClaimTypes.Name, tokenContent.Subject);
+	-> return the claims
+
+
+-> LoggedIn()
+	-> get the token as string
+	-> converted as JWT
+	-> add claim using ParseClaims() method
+	-> build user
+	-> check what is the AuthenticationState()
+	-> NotifyAuthenticationStateChanged()
+
+-> LoggedOut()
+	-> create a empty new ClaimPrincipal();
+	-> check what is the AuthenticationState() 
+	-> NotifyAuthenticationStateChanged()
+
+
+
+

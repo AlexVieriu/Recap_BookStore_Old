@@ -3,20 +3,24 @@
 @inject IAuthentificationRepository _authRepo
 @inject NavigationManager   _navManager
 
-
-<div class="card">
-    <div class="card-title">
-        <p>User Registration</p>
-    </div>
-
-    @if (registrationFailed == true)
-    {
-        <div class="text-danger">
-            <p>Registration Failed</p>
+@if (registerModel == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="card col-6">
+        <div class="card-title p-4">
+            <h4>User Registration</h4>
         </div>
-    }
 
-    <div class="card">
+        @if (registrationFailed == true)
+        {
+            <div class="text-danger">
+                <p>Registration Failed</p>
+            </div>
+        }
+
         <div class="card-body">
 
             <EditForm Model="registerModel" OnInvalidSubmit="HandleRegistration">
@@ -30,14 +34,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <InputText Id="password" type="password" class="form-control" @bind-Value="registerModel.Password" />
+                    <label for="pass">Password</label>
+                    <InputText Id="pas" type="password" class="form-control" @bind-Value="registerModel.Password" />
                     <ValidationMessage For="@(() => registerModel.Password)" />
                 </div>
 
                 <div class="form-group">
-                    <label for="passwordconfirmed">Confirmed Password</label>
-                    <InputText Id="passwordconfirmed" type="password" class="form-control" @bind-Value="registerModel.ConfirmedPassword" />
+                    <label >Confirmed Password</label>
+                    <InputText type="password" class="form-control" @bind-Value="registerModel.ConfirmedPassword" />
                     <ValidationMessage For="@(() => registerModel.ConfirmedPassword)" />
                 </div>
 
@@ -49,8 +53,7 @@
 
         </div>
     </div>
-</div>
-
+}
 
 
 @code{

@@ -45,44 +45,18 @@ Validation: UserDTOs
 [Route("login")]
 [Route("register")]
 
-
 [HttpPost]
-[Route("register")]
-[ProducesResponseType(StatusCodes.Status200OK)]
-[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-public async Task<IActionResult> Register([FromBody] UserDTO userDTO)
-{
-    var location = GetControllerActionName();
-    try
-    {
-        var userName = userDTO.UserName;
-        var userPassword = userDTO.UserPassword;
-
-        var newUser = new IdentityUser() { UserName = userName };
-
-        _logger.LogInfo($"Attempted to create {userName}");
-        var userCreated = await _userManager.CreateAsync(newUser);
-                
-        if(userCreated.Succeeded == false)
-        {
-            foreach(var error in userCreated.Errors)
-            {
-                _logger.LogError($"{location} : {error.Code} - {error.Description}");
-            }
-            return StatusCode(500, $"The {userName} couldn't be saved");
-        }
-
-        return Ok("User Created");
-    }
-
-    catch (Exception e)
-    {
-        return InternalError(e, location);                
-    }
-}
+-> add Route["register"]
+-> ProducesResponseType : 200, 500
+-> Register([FromBody] UserDTO userDTO)
+    -> location 
+    -> put all in a try catch block
+    -> new IdentityUser() { UserName = userName };
+    -> var userCreated = await _userManager.CreateAsync(newUser);
+    -> check if the creation is success, if not put userCreated.Error in a foreach and diplay them 
+    -> return ok()
 
 -> add documentation to the Action methods
-
 
 
 46. Setup User Registration Form
@@ -106,6 +80,8 @@ Contracts   : AuthenticationRepository.cs  (Register)
 
 -- AuthenticationRepository.cs --
 
+-> AuthentificationRepository : BaseRepository<RegisterModel>, IAuthentificationRepository
+-> add ctor so can be initialize in the base class
 
 
 -- Pages -> Users -> Register.razor --
@@ -121,7 +97,6 @@ inject NavigationManager navManager
 			  card-body  -> <EditForm>	-> 3 <div> : <label>, <InputText>, <ValidationMessage For="">
 										-> <button type="submit">
 										-> UserName, Password, ConfirmedPassword	
-
 
 @code: 
 
@@ -141,4 +116,16 @@ private void HandleRegistration()
     }
 }
 
+
+47. Setup User Login - Extend Blazor Authentication Provider
+
+Static -> LoginUrl          
+Models -> LoginModel.cs     : string UserName, string Password
+       -> TokenResponse.cs  : string Token
+
+-> install LocalStorage, Tokens.JWT
+
+-- Startup.cs -
+
+services.
 

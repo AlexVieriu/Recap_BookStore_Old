@@ -1,14 +1,17 @@
-using Blazored.LocalStorage;
-using BookStore_UI.Servicies;
-using BookStore_UI.Servicies.Contracts;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.IdentityModel.Tokens.Jwt;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using WebApplication1.Data;
 
-namespace BookStore_UI
+namespace WebApplication1
 {
     public class Startup
     {
@@ -25,11 +28,7 @@ namespace BookStore_UI
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddHttpClient();
-            services.AddBlazoredLocalStorage();
-
-            services.AddScoped<JwtSecurityTokenHandler>();
-            services.AddTransient<IAuthentificationRepository, AuthentificationRepository>();
+            services.AddSingleton<WeatherForecastService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
