@@ -1,7 +1,9 @@
 using Blazored.LocalStorage;
 using BookStore_UI.Servicies;
 using BookStore_UI.Servicies.Contracts;
+using BookStoreUI.Providers;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +30,11 @@ namespace BookStore_UI
             services.AddHttpClient();
             services.AddBlazoredLocalStorage();
 
+            services.AddScoped<ApiAuthenticationStateProvider>();
+            services.AddScoped<AuthenticationStateProvider>(p => 
+                p.GetRequiredService<ApiAuthenticationStateProvider>());
             services.AddScoped<JwtSecurityTokenHandler>();
+
             services.AddTransient<IAuthentificationRepository, AuthentificationRepository>();
         }
 

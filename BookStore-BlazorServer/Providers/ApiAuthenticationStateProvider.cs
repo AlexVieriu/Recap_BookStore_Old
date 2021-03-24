@@ -37,12 +37,13 @@ namespace BookStoreUI.Providers
                     return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
                 }
 
-                var tokenContent = _jwt.ReadJwtToken(savedToken);
+                var tokenContent = _jwt.ReadJwtToken(savedToken);                
+
                 var expiry = tokenContent.ValidTo;
                 if(expiry < DateTime.Now)
                 {
                     await _localStorage.RemoveItemAsync("authToken");
-                    return new AuthenticationState(new ClaimsPrincipal(new ClaimsPrincipal()));
+                    return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
                 }
 
                 // Get Claims from token and Build auth user object

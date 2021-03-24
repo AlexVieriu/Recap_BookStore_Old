@@ -50,12 +50,12 @@ namespace BookStore_API.Controllers
             try
             {
                 var userName = userDTO.UserName;
-                var userPassword = userDTO.UserPassword;
+                var password = userDTO.Password;
 
-                var newUser = new IdentityUser() { UserName = userName };
+                var user = new IdentityUser() { UserName = userName };
 
                 _logger.LogInfo($"Attempted to create {userName}");
-                var userCreated = await _userManager.CreateAsync(newUser);
+                var userCreated = await _userManager.CreateAsync(user, password);
                 
                 if(userCreated.Succeeded == false)
                 {
@@ -65,8 +65,9 @@ namespace BookStore_API.Controllers
                     }
                     return StatusCode(500, $"The {userName} couldn't be saved");
                 }
+                await _userManager.AddToRoleAsync(user, "Customer");
 
-                return Ok("User Created");
+                return Ok();
             }
 
             catch (Exception e)
@@ -91,7 +92,7 @@ namespace BookStore_API.Controllers
             try
             {
                 var userName = userDTO.UserName;
-                var userPasword = userDTO.UserPassword;
+                var userPasword = userDTO.Password;
 
                 _logger.LogInfo($"{location} : {userName} - Attempting to Login");
                 var result = await _signInManager.PasswordSignInAsync(userName, userPasword, false, false);

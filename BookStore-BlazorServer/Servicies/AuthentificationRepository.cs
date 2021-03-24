@@ -41,10 +41,14 @@ namespace BookStore_UI.Servicies
             if (response.IsSuccessStatusCode == false)
                 return false;
 
+            // get the Token from the response
             var content = await response.Content.ReadAsStringAsync();
-            var token =  JsonConvert.DeserializeObject<TokenReposnse>(content);
+            var token =  JsonConvert.DeserializeObject<TokenResponse>(content);
 
             // Store token
+            await _localStorage.SetItemAsync("authToken", token.Token);
+
+            // Change State of the app
             await _authStateProvider.LoggedIn();
 
             client.DefaultRequestHeaders.Authorization =
@@ -68,10 +72,10 @@ namespace BookStore_UI.Servicies
                                                 "application/json");
 
             var client = _httpClient.CreateClient();
-
             HttpResponseMessage response = await client.SendAsync(request);
 
             return response.IsSuccessStatusCode;
         }
+
     }
 }

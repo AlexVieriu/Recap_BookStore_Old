@@ -91,7 +91,17 @@ Models -> LoginModel.cs, TokenResponse.cs
 
 
 -- BookStore_UI.Servicies.Contracts -- 
-IAuthenticationRepository.cs : Register(), Login(), Logout()
+IAuthenticationRepository.cs : 
+
+Register()	:	-> send/recived request/response
+Login()		:	-> send/recived request/response
+				-> store the token from the Api to the localStorage
+				-> take the token from localStorage put it in token prop from TokenResponse class
+				-> use Login() to store the token
+				-> set the Authentification header for a HTTP request
+
+Logout()	:	-> remove the token from localStorage
+				-> LoggedOut()
 
 
 -- Provider -> ApiAuthenticationStateProvider.cs --
@@ -100,10 +110,10 @@ IAuthenticationRepository.cs : Register(), Login(), Logout()
 -> LoggedIn()
 -> LoggedOut()
 
--> override GetAuthenticationStateAsync()
+-> GetAuthenticationStateAsync()
 	try:	-> get the token and store it as string 
-			-> check if there is a token, if true, return an empty AuthenticationState object
-			-> read the JWT
+			-> check if there is a token, if false, return an empty AuthenticationState object
+			-> convert the string token to JwtSecurityToken
 			-> check the expiry date, return an empty AuthenticationState object if expired
 			-> get the claims from token and build auth user object
 			-> return authenticated person
@@ -129,6 +139,41 @@ IAuthenticationRepository.cs : Register(), Login(), Logout()
 	-> check what is the AuthenticationState() 
 	-> NotifyAuthenticationStateChanged()
 
+-> ParseClaims()
+	-> put the claims from token into a List
+	-> add a new claim (ClaimTypes.Name, tokenContent.subject)
+	-> return claims
 
 
+48. Setup User Login - Form and Logic
 
+-- Pages -> Users -> Login.razor --
+
+UI:
+-> add card : card-title 
+			  display msg if registration failed
+			  card-body  -> <EditForm>	-> 3 <div> : <label>, <InputText>, <ValidationMessage For="">
+										-> <button>
+										-> UserName, Password, ConfirmedPassword			 
+				
+@code: 
+-> declare RegisterModel
+-> declare prop for the result from the Register() method and use it to display message
+-> create method for ValidationSubmit: HandleLogin()
+
+
+-- app.razor --
+-> AuthorizeRouteView, CascadingAuthenticationState
+
+
+-- NavMenu.razor --
+-> use AuthorizeView, Authorized, NotAuthorized to show/hide the Login, Logout buttons
+-> 2 NavLink with Roles: Aministrator, Customer, to display when a customer/admin is LoggedIn
+
+
+-- Pages -> Users -> Logout.razor --
+
+@code:
+-> OninitializedAsync() 
+	-> Logout
+	-> navigate home
