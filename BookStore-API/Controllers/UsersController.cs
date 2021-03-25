@@ -102,7 +102,7 @@ namespace BookStore_API.Controllers
                     _logger.LogInfo($"{location} - Logged Successful");
                     var user = await _userManager.FindByNameAsync(userName);
                     var stringToken = await GenerateJWT(user);
-                    return Ok(stringToken);
+                    return Ok(new { token = stringToken });
                 }
 
                 _logger.LogInfo($"{location} : {userName} - Unauthorized");

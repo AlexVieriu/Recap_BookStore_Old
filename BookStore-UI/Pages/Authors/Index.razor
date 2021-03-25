@@ -1,0 +1,58 @@
+﻿@page "/authors"
+
+@inject IAuthorRepository _authRepo
+@inject NavigationManager _navManager
+
+@if (Authors == null)
+{
+    <h4 class="text-secondary">
+        Loding Data...
+    </h4>
+}
+else
+{
+    <h3>Authors List</h3>
+    <br />
+
+    <table class="table col-9">
+        <thead>
+            <tr>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var author in Authors)
+            {
+                <tr>
+                    <td>@author.FirstName</td>
+                    <td>@author.LastName</td>
+                    <td>
+                        <a href="/authors/view/@author.Id" class="btn btn-primary">
+                            <span class="oi oi-book"></span> View
+                        </a>
+                        <a href="/authors/update" class="btn btn-warning">
+                            <span class="oi oi-pencil"></span> Update
+                        </a>
+                        <a href="/authors/delete" class="btn btn-danger" >
+                            <span class="oi oi-delete"></span> Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code{
+    private IList<AuthorModel> Authors;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Authors = await _authRepo.GetAll(Endpoints.AuthorUrl);
+    }
+}

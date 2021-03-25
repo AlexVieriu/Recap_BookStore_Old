@@ -1,0 +1,33 @@
+﻿50. Setup Author Repository and Service
+
+-- BookStoreApi-UI --
+
+Author.cs : Id, FirstName, LastName, Bio, list of Books
+-> put validations 
+
+IAuthorRepository.cs	:  
+AuthorRepository.cs		:
+
+-- Startup.cs --
+-> inject the DI : IAuthorRepository, AuthorRepository
+
+
+51. Setup List Authors
+
+-- Pages -> Authors -> Author.razor --
+
+UI:
+create a table with 3 lines : First Name, Last Name, Actions(3 <a>: view, edit, delete)
+
+@code:
+-> list of Authors
+-> OnInitializedAsync()
+	-> get the authors
+
+
+52. Setup View Author
+
+
+
+
+
