@@ -24,14 +24,16 @@ namespace BookStore_UI.Servicies
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
 
-            request.Content = new StringContent(JsonConvert.SerializeObject(obj));
+            request.Content = new StringContent(JsonConvert.SerializeObject(obj),
+                                                Encoding.UTF8,
+                                                "application/json");
 
             var client = _client.CreateClient();
             client.DefaultRequestHeaders.Authorization = await HeaderValue();
 
             HttpResponseMessage response = await client.SendAsync(request);
 
-            if (response.StatusCode == HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.Created)
                 return true;
 
             return false;

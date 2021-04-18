@@ -1,13 +1,12 @@
 ﻿@page "/authors/view/{id:int}"
 
+
 @inject IAuthorRepository _authRepo
 @inject NavigationManager _navManager
 
 @if (Author == null)
 {
-    <p class="text-secondary">
-        Loding List of Authors...
-    </p>
+    <InfoComponent Message="Loading..." />
 }
 else
 {
@@ -75,5 +74,4 @@ else
     {
         _navManager.NavigateTo("/authors");
     }
-
 }

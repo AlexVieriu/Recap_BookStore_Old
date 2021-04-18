@@ -65,3 +65,128 @@ UI:
 
 53. Setup Update Author
 
+-> create ErrorComponent
+-> create InfoComponent
+
+-- Update.razor --
+
+-> display InfoComponent if author Model is null
+-> display ErrorComponent if iSuccess is false
+-> Card -> <EditForm>:  FirstName, LastName, Bio (3 Form-Group : Label, InputText, ValidationMessage For )
+		-> <button>		: Update Author
+-> button -> BackToList
+
+
+@code:
+-> [Parameter] int Id
+-> AuthorModel authorModel
+
+-> OnInitializedAsync()
+	-> get author by Id
+
+-> OnUpdateSubmit()
+	-> isSuccess = _author.Update(url, model, model.id)
+	-> isSuccess = true
+			BackToList() ;
+
+-> BackToList() 
+	_navManage.NavigateTo("/authors");
+
+
+54. Setup Delete Author 
+
+-> same as View.razor
+
+
+UI:
+-> conditions if :  isSuccess == false	
+					Id < 1
+					Author is null
+
+-> author Table : 3*tr> 2*td (First Name, Last Name, Biography)
+-> display something if there are no books
+-> add a card to display the books			: card, card-header, list-group list-group-flush, list-group-item	
+-> create a button to go back to List of authors 
+
+@code:
+-> declare parameter Id
+-> declare author Model
+-> OnInitializedAsync()
+	-> get author by Id
+-> BackToList()
+
+55. Setup Create Author 
+
+-> same as Edit
+
+UI:
+
+(if isSuccess == false)
+-> add ErrorComponent 
+
+else
+-> Card :	<EditForm>	-> 3 div (First Name, Last Name, Bio) : <label>, <InputText>, <ValidationMessage Fro>
+							 form-group, form-control
+						-> button @onclick= BackToList
+
+code:
+
+-> create AuthorModel object
+-> bool isSuccess
+-> OnCreateSubmit()
+	-> isSuccess -> BackToList()
+-> BackToList()
+
+
+56. Essential Layout Fixes and Additions
+
+-- MainLayout.razor --
+
+<div class="content px-4">
+    <div class="context px-4 mt-5">
+        <div class="card">
+            @Body
+        </div>
+    </div>            
+</div>
+
+-> remove all the <card> in the .razor Pages
+-> put Authorization on every .razor Page :	 
+	@attribute [Authorize(Roles ="Administrator")]
+
+-> hide the Create, Update, Delete button from Customer role:
+
+<AuthorizeView Roles="Administrator">
+	...
+<AuthorizeView/>
+
+
+57. Fix Author-Book JSON Response
+
+-- BookStore-API -> Services -> AuthorRepository.cs --
+
+FindAll()
+	.Include(q=> q.Books)
+    .ToListAsync();
+
+FindById(int id)
+	.Include(q=> q.Books)
+    .FirstOrDefaultAsync(q => q.Id == id);
+
+-> include .Newtonsoftjson
+
+-- Startup.cs --
+
+services.AddControllers()
+        .AddNewtonsoftJson(op => op.SerializerSettings.ReferenceLoopHandling 
+                                    = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+.Ignore					: Ignore loop references and do not serialize
+.ReferenceLoopHandling	: Specifies reference loop handling options for the Newtonsoft.Json.JsonSerializer
+						 
+
+
+
+
+
+

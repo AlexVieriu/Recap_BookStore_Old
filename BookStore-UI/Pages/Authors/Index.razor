@@ -1,49 +1,69 @@
 ﻿@page "/authors"
 
+
 @inject IAuthorRepository _authRepo
 @inject NavigationManager _navManager
 
 @if (Authors == null)
 {
-    <h4 class="text-secondary">
-        Loding Data...
-    </h4>
+    <InfoComponent Message="Loding data..." />
 }
 else
 {
     <h3>Authors List</h3>
     <br />
 
-    <table class="table col-9">
-        <thead>
-            <tr>
-                <th>FirstName</th>
-                <th>LastName</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+    <AuthorizeView Roles="Administrator">
+        <a href="/authors/create" class="btn btn-outline-success col-3" @onclick="NavigateToCreatePage">
+            <span class="oi oi-plus"></span> Create New Author
+        </a>
+        <br />
+        <br />
+    </AuthorizeView>
+    
 
-        <tbody>
-            @foreach (var author in Authors)
-            {
+    @if (Authors.Count < 1)
+    {
+        <br />
+        <InfoComponent Message="There are no Authors in the DataBase, Create a New Author" />
+    }
+
+    else
+    {
+        <br />
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@author.FirstName</td>
-                    <td>@author.LastName</td>
-                    <td>
-                        <a href="/authors/view/@author.Id" class="btn btn-primary">
-                            <span class="oi oi-book"></span> View
-                        </a>
-                        <a href="/authors/update/@author.Id" class="btn btn-warning">
-                            <span class="oi oi-pencil"></span> Update
-                        </a>
-                        <a href="/authors/delete" class="btn btn-danger" >
-                            <span class="oi oi-delete"></span> Delete
-                        </a>
-                    </td>
+                    <th>FirstName</th>
+                    <th>LastName</th>
+                    <th>Actions</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+
+            <tbody>
+                @foreach (var author in Authors)
+                {
+                    <tr>
+                        <td>@author.FirstName</td>
+                        <td>@author.LastName</td>
+                        <td>
+                            <a href="/authors/view/@author.Id" class="btn btn-primary">
+                                <span class="oi oi-book"></span> View
+                            </a>
+                            <AuthorizeView Roles="Administrator">
+                                <a href="/authors/update/@author.Id" class="btn btn-warning">
+                                    <span class="oi oi-pencil"></span> Update
+                                </a>
+                                <a href="/authors/delete/@author.Id" class="btn btn-danger">
+                                    <span class="oi oi-delete"></span> Delete
+                                </a>
+                            </AuthorizeView>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 }
 
 
@@ -53,5 +73,10 @@ else
     protected override async Task OnInitializedAsync()
     {
         Authors = await _authRepo.GetAll(Endpoints.AuthorUrl);
+    }
+
+    private void NavigateToCreatePage()
+    {
+        _navManager.NavigateTo("/authors/create");
     }
 }

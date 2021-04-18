@@ -53,16 +53,69 @@ UI:
 -- Update.razor --
 
 -> display InfoComponent if author Model is null
--> <EditForm> : FirstName, LastName, Bio (3 <div>)
-				
+-> display ErrorComponent if iSuccess is false
+-> Card -> <EditForm>	: FirstName, LastName, Bio (3 <div>)
+		-> <button>		: Update Author
+-> button -> BackToList
+
 
 @code:
 -> declare parameter Id
 -> declare author Model
 -> OnInitializedAsync()
 	-> get author by Id
--> EditAuthor()
+-> OnUpdateSubmit()
 -> BackToList() 
+
+54. Setup Delete Author 
+
+UI:
+
+-> add ErrorComponent
+-> Card :	<EditForm>	-> 3 div (First Name, Last Name, Bio) 
+						-> create a button to go back to the Author List
+
+
+code:
+
+-> create AuthorModel object
+-> bool isSuccess
+-> OnCreateSubmit()
+	-> isSuccess -> BackToList()
+-> BackToList()
+
+
+
+56. Essential Layout Fixes and Additions
+
+-- MainLayout.razor --
+
+-> put @body in <card>
+
+-> remove all the <card> in the .razor Pages
+-> put Authorization on every .razor Page :	 
+-> hide the Create, Update, Delete button from Customer role
+
+
+57. Fix Author-Book JSON Response
+
+-- BookStore-API -> Services -> AuthorRepository.cs --
+
+FindAll()
+FindById(int id)
+
+-> include .Newtonsoftjson
+
+-- Startup.cs --
+
+services.AddControllers()
+        .AddNewtonsoftJson(op => op.SerializerSettings.ReferenceLoopHandling 
+                                    = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+-> what .Ignore does ?
+						 
+
+
 
 
 

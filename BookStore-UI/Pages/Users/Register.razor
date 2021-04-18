@@ -3,45 +3,43 @@
 @inject IAuthentificationRepository _authRepo
 @inject NavigationManager   _navManager
 
-<div class="card col-6">
-    <h4 class="card-title">Register Now</h4>
 
-    @if (!result)
-    {
-        <div class="text-danger">
-            <p>Registration Failed</p>
+<h4 class="card-title">Register Now</h4>
+
+@if (!result)
+{
+    <ErrorComponent Message="Registration Failed"/>
+}
+
+<div class="card-body">
+
+    <EditForm Model="registerModel" OnValidSubmit="HandleRegistration">
+        <DataAnnotationsValidator />
+
+        <div class="form-group">
+            <label for="username">User Name</label>
+            <InputText Id="username" class="form-control" @bind-Value="registerModel.UserName" />
+            <ValidationMessage For="@(() => registerModel.UserName)" />
         </div>
-    }
 
-    <div class="card-body">
+        <div class="form-group">
+            <label for="pass">Password</label>
+            <InputText Id="pas" type="password" class="form-control" @bind-Value="registerModel.Password" />
+            <ValidationMessage For="@(() => registerModel.Password)" />
+        </div>
 
-        <EditForm Model="registerModel" OnValidSubmit="HandleRegistration">
-            <DataAnnotationsValidator />
+        <div class="form-group">
+            <label>Confirmed Password</label>
+            <InputText type="password" class="form-control" @bind-Value="registerModel.ConfirmedPassword" />
+            <ValidationMessage For="@(() => registerModel.ConfirmedPassword)" />
+        </div>
 
-            <div class="form-group">
-                <label for="username">User Name</label>
-                <InputText Id="username" class="form-control" @bind-Value="registerModel.UserName" />
-                <ValidationMessage For="@(() => registerModel.UserName)" />
-            </div>
+        <button type="submit" class="btn btn-primary btn-block">Register</button>
 
-            <div class="form-group">
-                <label for="pass">Password</label>
-                <InputText Id="pas" type="password" class="form-control" @bind-Value="registerModel.Password" />
-                <ValidationMessage For="@(() => registerModel.Password)" />
-            </div>
+    </EditForm>
 
-            <div class="form-group">
-                <label>Confirmed Password</label>
-                <InputText type="password" class="form-control" @bind-Value="registerModel.ConfirmedPassword" />
-                <ValidationMessage For="@(() => registerModel.ConfirmedPassword)" />
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block">Register</button>
-
-        </EditForm>
-
-    </div>
 </div>
+
 
 
 @code{

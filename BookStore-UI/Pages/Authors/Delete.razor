@@ -1,8 +1,85 @@
-﻿@page "/authors/delete"
+﻿@page "/authors/delete/{Id:int}"
+
+@attribute [Authorize(Roles = "Administrator")]
+
+@inject IAuthorRepository _authRepo
+@inject NavigationManager _navManager
 
 <h3>Delete Author</h3>
+<br />
+
+@if (isSuccess == false)
+{
+    <ErrorComponent Message="Coudn't delete the record" />
+}
+
+@if (Id < 1)
+{
+    <ErrorComponent Message="Id less then 1" />
+}
+
+@if (Author is null)
+{
+    <InfoComponent Message="Loading..." />
+}
+
+else
+{
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>First Name</td>
+                <td>@Author.FirstName</td>
+            </tr>
+            <tr>
+                <td>Last Name</td>
+                <td>@Author.LastName</td>
+            </tr>
+            <tr>
+                <td>biography</td>
+                <td>@Author.Bio</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button class="btn btn-danger col-3 m-2" @onclick="DeleteAuthor">
+        <span class="oi oi-delete"></span> Delete Author
+    </button>
+
+
+
+    <br />
+
+    <button class="btn btn-secondary" @onclick="BackToList">
+        <span class="oi oi-media-step-backward"></span> BackToList
+    </button>
+}
+
 
 
 @code{
+    [Parameter]
+    public int Id { get; set; }
+
+    public AuthorModel Author { get; set; }
+    private bool isSuccess = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Author = await _authRepo.GetbyId(Endpoints.AuthorUrl, Id);
+    }
+
+    public async Task DeleteAuthor()
+    {
+        isSuccess = await _authRepo.Delete(Endpoints.AuthorUrl, Id);
+
+        if (isSuccess)
+            BackToList();
+    }
+
+    public void BackToList()
+    {
+        _navManager.NavigateTo("/authors");
+    }
 
 }
