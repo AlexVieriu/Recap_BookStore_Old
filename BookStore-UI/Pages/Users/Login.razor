@@ -10,7 +10,9 @@
     </div>
     @if (!result)
     {
-        <p>Failed to Login</p>
+        <p class="text-danger p-4 h5">
+            Failed to Login
+        </p>
     }
 
     <div class="card-body">
@@ -25,7 +27,7 @@
 
             <div class="form-group">
                 <label>Password</label>
-                <InputText @bind-Value="loginModel.Password" class="form-control" type="password"/>
+                <InputText @bind-Value="loginModel.Password" class="form-control" type="password" />
                 <ValidationMessage For="@(() => loginModel.Password)" />
             </div>
 

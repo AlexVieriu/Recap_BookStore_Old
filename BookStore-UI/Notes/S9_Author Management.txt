@@ -2,7 +2,7 @@
 
 -- BookStoreApi-UI --
 
-Author.cs : Id, FirstName, LastName, Bio, list of Books
+AuthorModel.cs : Id, FirstName, LastName, Bio, list of Books
 -> put validations 
 
 IAuthorRepository.cs	:  
@@ -27,6 +27,42 @@ create a table with 3 lines : First Name, Last Name, Actions(3 <a>: view, edit, 
 
 52. Setup View Author
 
+BookModel.cs: Id, Title, Yaer, Isbn, Summary, Image, Price, AuthorId, Author
+
+-- Authors -> BookModel.cs --
+
+UI:
+-> display ErrorComponent if author Model is null
+-> author Table : 
+-> display something if there are no books
+-> add a card to diaply the books
+-> create a button to go back to List of authors 
+
+@code:
+-> declare parameter Id
+-> declare author Model
+-> OnInitializedAsync()
+	-> get author by Id
+-> BackToList()
+
+
+53. Setup Update Author
+
+-> create an Error Component
+
+-- Update.razor --
+
+-> display InfoComponent if author Model is null
+-> <EditForm> : FirstName, LastName, Bio (3 <div> )
+				
+
+@code:
+-> declare parameter Id
+-> declare author Model
+-> OnInitializedAsync()
+	-> get author by Id
+-> EditAuthor()
+-> BackToList() 
 
 
 

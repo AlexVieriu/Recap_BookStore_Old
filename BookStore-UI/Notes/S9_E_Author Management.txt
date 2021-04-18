@@ -1,1 +1,67 @@
 ﻿50. Setup Author Repository and Service
+
+-- BookStoreApi-UI --
+
+AuthorModel.cs	: int Id, string FirstName, string LastName, string Bio, IList<Book> Books
+
+[Required]		: FirstName, LastName, Bio
+[DisplayName]	: FirstName, LastName, Bio
+[StringLength]	: Bio
+
+Create : IAuthorRepository.cs, AuthorRepository.cs
+
+IAuthorRepository	: IBaseRepository<AuthorModel> 
+AuthorRepository	: BaseRepository<AuthorModel>, IAuthorRepository
+-> declare ctor (IHttpClientFactory, ILocalStorageService)
+
+-- Startup.cs --
+
+services.AddTransient<IAuthorRepository,AuthorRepository>();
+
+
+-- Dictionary --
+
+IHttpClientFactory : 
+
+-> a factory abstraction for a component that can create System.Net.Http.HttpClient 
+instances with custom configuration for a given logical name.
+
+https://www.youtube.com/watch?v=cwgck1k0YKU&ab_channel=IAmTimCorey
+
+
+51. Setup List Authors
+
+-- Pages -> Authors -> Author.razor --
+
+UI:
+create a table with 3 lines : First Name, Last Name, Actions(3 <a>: view, edit, delete)
+
+@code:
+-> private IList<Authors> Authors
+-> OnInitializedAsync()
+	-> get the authors : Authors = await _authRepo.GetAll(Endpoints.AuthorUrl);
+
+
+52. Setup View Author
+
+BookModel.cs: Id, Title, Yaer, Isbn, Summary, Image, Price, AuthorId, Author
+
+-- Authors -> BookModel.cs --
+
+UI:
+-> display something if author Model is null
+-> author Table : 
+-> display something if there are no books
+-> add a card to display the books			: card, card-header, list-group list-group-flush, list-group-item	
+-> create a button to go back to List of authors 
+
+@code:
+-> declare parameter Id
+-> declare author Model
+-> OnInitializedAsync()
+	-> get author by Id
+-> BackToList()
+
+
+53. Setup Update Author
+

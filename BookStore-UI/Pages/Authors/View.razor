@@ -1,1 +1,79 @@
-﻿
+﻿@page "/authors/view/{id:int}"
+
+@inject IAuthorRepository _authRepo
+@inject NavigationManager _navManager
+
+@if (Author == null)
+{
+    <p class="text-secondary">
+        Loding List of Authors...
+    </p>
+}
+else
+{
+    <h4>Author View</h4>
+    <br />
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>First Name</td>
+                <td>@Author.FirstName</td>
+            </tr>
+            <tr>
+                <td>Last Name</td>
+                <td>@Author.LastName</td>
+            </tr>
+            <tr>
+                <td>biography</td>
+                <td>@Author.Bio</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br />
+
+    @if (Author.Books == null || Author.Books.Count < 1)
+    {
+        <p class="text-secondary">
+            The Author have no Books
+        </p>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-header">
+                List of Books
+            </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var book in Author.Books)
+                {
+                    <li class="list-group-item">@($"{book.Title} - {book.Price} ")</li>
+                }
+            </ul>
+        </div>
+    }
+    <br />
+    <button class="btn btn-secondary" @onclick="BackToList">
+        <span class="oi oi-media-skip-backward"></span> Back to Authors List
+    </button>
+}
+
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    private AuthorModel Author = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Author = await _authRepo.GetbyId(Endpoints.AuthorUrl, Id);
+    }
+
+    private void BackToList()
+    {
+        _navManager.NavigateTo("/authors");
+    }
+
+}

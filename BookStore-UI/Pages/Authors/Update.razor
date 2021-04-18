@@ -1,8 +1,10 @@
-﻿@page "/authors/update"
+﻿@page "/authors/update/{id:int}"
 
 <h3>Update Author</h3>
 <br />
 
-@code{ 
 
+@code{
+    [Parameter]
+    public int Id { get; set; }
 }
