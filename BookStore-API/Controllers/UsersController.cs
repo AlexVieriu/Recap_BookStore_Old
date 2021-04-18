@@ -1,4 +1,4 @@
-﻿using BookStore_API.DTOs.Log;
+﻿using BookStore_API.DTOs;
 using BookStore_API.Services.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -152,7 +152,7 @@ namespace BookStore_API.Controllers
                 _config["Jwt:Issuer"],
                 claims,
                 null,
-                expires: DateTime.Now.AddMinutes(5),
+                expires: DateTime.Now.AddMinutes(50),
                 signingCredentials : credentials
                 ); 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);

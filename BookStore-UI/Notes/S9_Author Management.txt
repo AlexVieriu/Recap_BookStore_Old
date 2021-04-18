@@ -53,7 +53,7 @@ UI:
 -- Update.razor --
 
 -> display InfoComponent if author Model is null
--> <EditForm> : FirstName, LastName, Bio (3 <div> )
+-> <EditForm> : FirstName, LastName, Bio (3 <div>)
 				
 
 @code:

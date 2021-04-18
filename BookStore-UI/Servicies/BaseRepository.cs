@@ -90,7 +90,7 @@ namespace BookStore_UI.Servicies
             return null;
         }
 
-        public async Task<T> Update(string url, int id, T obj)
+        public async Task<bool> Update(string url, T obj, int id)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, url + id);
 
@@ -103,12 +103,9 @@ namespace BookStore_UI.Servicies
 
             HttpResponseMessage response = await client.SendAsync(request);
             if (response.StatusCode == HttpStatusCode.OK)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<T>(content);
-            }
+                return true;
 
-            return null;
+            return false;
         }
 
         private async Task<AuthenticationHeaderValue> HeaderValue()

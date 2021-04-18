@@ -1,10 +1,96 @@
-﻿@page "/authors/update/{id:int}"
+﻿@page "/authors/update/{Id:int}"
+
+
+@inject IAuthorRepository _authRepo
+@inject NavigationManager _navManager
 
 <h3>Update Author</h3>
 <br />
+
+@if (authorModel is null)
+{
+    <InfoComponent Message="Loding..." />
+}
+@if (Id < 1)
+{
+    <ErrorComponent Message="Id is not good" />
+}
+
+@if (isSuccess != true)
+{
+    <ErrorComponent Message="The Author could not be saved" />
+    <br />
+    <button class="btn btn-secondary" @onclick="BackToList">
+        <span class="oi oi-media-step-backward"></span> Back To List
+    </button>
+}
+
+else
+{
+    <div class="card col-6">
+        <div class="card-body">
+            <EditForm Model="authorModel" OnValidSubmit="OnUpdateSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label>First Name</label>
+                    <InputText class="form-control" @bind-Value="authorModel.FirstName" />
+                    <ValidationMessage For="@(()=> authorModel.FirstName)" />
+                </div>
+
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <InputText class="form-control" @bind-Value="authorModel.LastName" />
+                    <ValidationMessage For="@(()=> authorModel.LastName)" />
+                </div>
+
+                <div class="form-group">
+                    <label>Biography</label>
+                    <InputTextArea class="form-control" @bind-Value="authorModel.Bio" />
+                    <ValidationMessage For="@(()=> authorModel.Bio)" />
+                </div>
+                <br />
+                <button type="submit" class="btn btn-primary">Update Author</button>
+
+            </EditForm>
+        </div>
+        <br />
+    </div>
+
+    <br />
+    <button class="btn btn-secondary" @onclick="BackToList">
+        <span class="oi oi-media-step-backward"></span> Back To List
+    </button>
+}
+
 
 
 @code{
     [Parameter]
     public int Id { get; set; }
+
+    public AuthorModel authorModel = new AuthorModel();
+    public bool isSuccess = true;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        authorModel = await _authRepo.GetbyId(Endpoints.AuthorUrl, Id);
+    }
+
+    private async Task OnUpdateSubmit()
+    {
+        isSuccess = await _authRepo.Update(Endpoints.AuthorUrl, authorModel, authorModel.Id);
+
+        if (isSuccess)
+            BackToList();
+
+
+    }
+
+    private void BackToList()
+    {
+        _navManager.NavigateTo("/authors");
+    }
 }

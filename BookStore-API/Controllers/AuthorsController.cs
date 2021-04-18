@@ -156,6 +156,7 @@ namespace BookStore_API.Controllers
         /// <returns>Returns the Author Updated</returns>
         [HttpPut("{id:int}")]
         [Authorize(Roles ="Administrator")]
+        //[AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -196,7 +197,7 @@ namespace BookStore_API.Controllers
                 }
 
                 _logger.LogInfo($"{location}: Record successfully updated");
-                return Ok(authorUpdateDTO);
+                return Ok(isSuccess);
             }
             catch (Exception e)
             {
