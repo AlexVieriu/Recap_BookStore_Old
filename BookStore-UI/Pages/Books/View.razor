@@ -1,0 +1,84 @@
+﻿@page "/books/view/{id:int}"
+
+@inject IBookRepository _bookRepo
+
+<h4>View Book</h4>
+<br />
+<br />
+
+@if (Id < 1)
+{
+    <ErrorComponent Message="The id is not valid" />
+    <a href="/books" class="btn btn-secondary">
+        Back To List
+    </a>
+}
+@if (Book is null)
+{
+    <InfoComponent Message="Loading..." />
+}
+else
+{
+<div class="row">
+    <div class="col-6">
+        <table class="table table-responsive">
+            <tr>
+                <td><strong>Title</strong></td>
+                <td>@Book.Title</td>
+            </tr>
+            <tr>
+                @if (Book.Author is null)
+                {
+                    <td>
+                        <span>There is no Author</span>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <a href="/authors/view/@Book.AuthorId">
+                            @Book.Author.FirstName @Book.Author.LastName
+                        </a>
+                    </td>
+                }
+            </tr>
+            <tr>
+                <td><strong>Summary</strong></td>
+                <td>@Book.Summary</td>
+            </tr>
+            <tr>
+                <td><strong>Published Year</strong></td>
+                <td>@Book.Year</td>
+            </tr>
+            <tr>
+                <td><strong>ISBN</strong></td>
+                <td>@Book.Isbn</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="col-4">
+        <img src="/images/@Book.Image" style="height:300px; width:300px" />
+        <h4 class="text-center text-info">@Book.Price</h4>
+    </div>
+
+</div>
+}
+
+<a href="/books" class="btn btn-outline-secondary">
+    <span class="oi oi-media-skip-backward"></span>
+    Back To List
+</a>
+
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    public BookModel Book { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Book = await _bookRepo.GetbyId(Endpoints.BookUrl, Id);
+    }
+}

@@ -2,6 +2,8 @@
 using BookStore_API.Data;
 using BookStore_API.DTOs;
 using BookStore_API.Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,13 +13,14 @@ namespace BookStore_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BookController : ControllerBase
+    [Authorize]
+    public class BooksController : ControllerBase
     {
         private readonly IBookRepository _bookRepository;
         private readonly ILoggerService _logger;
         private readonly IMapper _mapper;
 
-        public BookController(IBookRepository bookRepository,
+        public BooksController(IBookRepository bookRepository,
                               ILoggerService logger,
                               IMapper mapper)
         {
@@ -27,6 +30,8 @@ namespace BookStore_API.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllBooks()
         {
             var location = GetControllerActionNames();
@@ -47,6 +52,8 @@ namespace BookStore_API.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetBookById(int id)
         {
             var location = GetControllerActionNames();
@@ -76,6 +83,10 @@ namespace BookStore_API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] BookCreateDTO bookCreateDTO)
         {
             var location = GetControllerActionNames();
@@ -114,6 +125,11 @@ namespace BookStore_API.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "Administrator")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update(int id, [FromBody] BookUpdateDTO bookUpdateDTO)
         {
             var location = GetControllerActionNames();
@@ -158,6 +174,11 @@ namespace BookStore_API.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Administrator")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id)
         {
             var location = GetControllerActionNames();

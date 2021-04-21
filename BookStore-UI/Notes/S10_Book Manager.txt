@@ -1,1 +1,17 @@
-﻿
+﻿59. Setup Book Repository and Service
+
+-> create : BookRepository.cs, IBookRepository.cs
+-> add DI for BookRepository
+
+
+60. Setup List Books
+
+-- BookStore-API -- 
+
+BookRepository.cs	-> FindAll() -> .Include(q=> q.Author)
+					-> FindById() -> .Include(q => q.Author)
+
+-- BookStore-UI --
+Pages -> Books -> Create, Delete, Index, Update, View --
+
+

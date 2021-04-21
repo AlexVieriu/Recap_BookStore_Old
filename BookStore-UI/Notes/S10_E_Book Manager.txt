@@ -1,1 +1,68 @@
 ﻿59. Setup Book Repository and Service
+
+-> Servicies -> BookRepository.cs
+			 -> Contracts -> IBookRepository.cs
+
+-> add ctor: IHttpClientFactory, ILocalStorageService
+
+-- Startup.cs --
+
+services.AddTransient<IBookRepository, BookRepository>()
+
+
+60. Setup List Books
+
+-> CTRL + Click to go to the class 
+
+
+-- BookStore-UI -> Pages -> Books.razor --
+
+UI:
+-> [Authorize]
+-> add DI: IBookRepository, NavigationManager
+-> @if(model is null){...}
+-> else : -> add Create Book button
+		  -> @if(Model.Count <1) 
+		  -> table-responsive : -> 5<th> -> blank, Title, Price, Author, blank
+								-> foreach : picture, Title, Price, Author, 3 buttons: view, update, delete
+
+-> put Create, Update, Delete buttons in <AuthorizeView Roles="Administrator">
+
+
+@code:
+-> IList<BookModel>
+-> OnInitilizeAsync()
+	
+
+61. Setup View Book
+
+-> create a component : BackToList()
+
+-> Id<1
+-> Model is null
+-> row :
+	-> Table col-6	: 5* (tr>2*td) : Title, Author(if Model.null -> no Author, else -> href)	
+					  Summary, Published Year, ISBN
+
+	-> col-4		: <img src="/images/@Book.Image" style="height:300px; width:300px">
+					  <h3>class="text-center text-info">@Book.Price</h3>
+
+<a href="/books" class="btn btn-outline-secondary">
+    <span class="oi oi-media-skip-backward"></span>
+    Back To List
+</a>
+
+
+62. Setup Create Book - Part 1
+
+-> DropDownList		: https://www.youtube.com/watch?v=wf9oQ6-fttM&ab_channel=BrianLagunas
+-> BlazorInputFile	:
+
+@attribute [Authorize(Role = Administrator)]
+
+-> IBookRepository, IAuthorRepository
+
+-> <EditForm>: 3 form-group : Title, Isbn, Price, Author(DropDownList)
+
+
+

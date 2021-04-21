@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using BookStore_UI.Servicies.Contracts;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -18,7 +19,7 @@ namespace BookStore_UI.Servicies
         {
             _client = client;
             _localStorage = localStorage;
-        }       
+        }
 
         public async Task<bool> Create(string url, T obj)
         {
@@ -47,9 +48,9 @@ namespace BookStore_UI.Servicies
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, url + id);
 
             var client = _client.CreateClient();
-            client.DefaultRequestHeaders.Authorization = await HeaderValue(); 
+            client.DefaultRequestHeaders.Authorization = await HeaderValue();
 
-            HttpResponseMessage response = await client.SendAsync(request);          
+            HttpResponseMessage response = await client.SendAsync(request);
             if (response.StatusCode == HttpStatusCode.NoContent)
                 return true;
 
@@ -58,21 +59,30 @@ namespace BookStore_UI.Servicies
 
         public async Task<IList<T>> GetAll(string url)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
-
-            var client = _client.CreateClient();
-            client.DefaultRequestHeaders.Authorization = await HeaderValue();
-
-            HttpResponseMessage response = await client.SendAsync(request);
-            if (response.StatusCode == HttpStatusCode.OK)
+            try
             {
-                var content = await response.Content.ReadAsStringAsync();
-                var list = JsonConvert.DeserializeObject<IList<T>>(content);
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
 
-                return list;
+                var client = _client.CreateClient();
+                client.DefaultRequestHeaders.Authorization = await HeaderValue();
+
+                HttpResponseMessage response = await client.SendAsync(request);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var list = JsonConvert.DeserializeObject<IList<T>>(content);
+
+                    return list;
+                }
+                else
+                {
+                    return null;
+                }
             }
-
-            return null;
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         public async Task<T> GetbyId(string url, int id)
@@ -112,8 +122,7 @@ namespace BookStore_UI.Servicies
 
         private async Task<AuthenticationHeaderValue> HeaderValue()
         {
-            var bearerToken =  await _localStorage.GetItemAsStringAsync("authToken");
-
+            var bearerToken = await _localStorage.GetItemAsStringAsync("authToken");
             return new AuthenticationHeaderValue("bearer", bearerToken);
         }
     }
