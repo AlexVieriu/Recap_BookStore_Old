@@ -1,8 +1,6 @@
 ﻿@page "/authors/view/{id:int}"
 
-
 @inject IAuthorRepository _authRepo
-@inject NavigationManager _navManager
 
 @if (Author == null)
 {
@@ -53,9 +51,20 @@ else
         </div>
     }
     <br />
-    <button class="btn btn-secondary" @onclick="BackToList">
-        <span class="oi oi-media-skip-backward"></span> Back to Authors List
-    </button>
+
+    <a href="/authors/edit/@Author.Id" class="btn btn-outline-warning m-2">
+        <span class="oi oi-pencil"></span>
+        Edit Author
+    </a>
+
+    <a href="/authors/delete/@Author.Id" class="btn btn-outline-danger m-2">
+        <span class="oi oi-circle-x"></span>
+        Delete Author
+    </a>
+
+    <a href="/authors" class="btn btn-secondary m-2">
+        <span class="oi oi-media-skip-backward"></span> Back to List
+    </a>
 }
 
 
@@ -68,10 +77,5 @@ else
     protected override async Task OnInitializedAsync()
     {
         Author = await _authRepo.GetbyId(Endpoints.AuthorUrl, Id);
-    }
-
-    private void BackToList()
-    {
-        _navManager.NavigateTo("/authors");
     }
 }

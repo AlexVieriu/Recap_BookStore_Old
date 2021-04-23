@@ -1,8 +1,106 @@
 ﻿@page "/books/update/{id:int}"
 
+@attribute [Authorize(Roles = "Administrator")]
+
+@inject IBookRepository _bookRepo
+@inject IAuthorRepository _authRepo
+@inject IFileUpload _fileUpload
+@inject NavigationManager _navManager
+@inject IToastService _toastService
+
+
 <h4>Update Book</h4>
+<hr />
+<br />
+
+@if (Id < 1)
+{
+
+}
+else if (Book == null)
+{
+
+}
 
 
 @code{
+    [Parameter]
+    public int Id { get; set; }
+
+    private BookModel Book = new();
+    private IList<AuthorModel> Authors;
+    private IFileListEntry file;
+    private bool isSuccess = true;
+    private bool isInvalidFileType = false;
+    private bool isFileChanged = false;
+    private string imageDataURL;
+    private MemoryStream msFile;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Book = await _bookRepo.GetbyId(Endpoints.BookUrl, Id);
+        Authors = await _authRepo.GetAll(Endpoints.AuthorUrl);
+    }
+
+    private async Task HandleUpdate()
+    {
+        if (!isInvalidFileType)
+        {
+            if (file != null)
+            {
+                var ext = Path.GetExtension(file.Name);
+                var picId = Guid.NewGuid().ToString().Replace("-", "");
+                var picName = $"{picId}{ext}";
+
+                _fileUpload.RemoveFile(Book.Image);
+                _fileUpload.UploadFile(file, msFile, picName);
+
+                Book.Image = picName;
+            }
+            else if (isFileChanged && file == null)
+            {
+                _fileUpload.RemoveFile(Book.Image);
+                Book.Image = string.Empty;
+            }
+
+            isSuccess = await _bookRepo.Update(Endpoints.BookUrl, Book, Book.Id);
+
+            if (isSuccess)
+            {
+                _toastService.ShowSuccess("Book Updated", "");
+                _navManager.NavigateTo("/books");
+            }
+        }
+    }
+
+    private async Task HandleFileSection(IFileListEntry[] files)
+    {
+        file = files.FirstOrDefault();
+        isFileChanged = true;
+        if (file != null)
+        {
+            var name = file.Name;
+            if (name.Contains("jpg") || name.Contains("png") || name.Contains("jpeg"))
+            {
+                msFile = new MemoryStream();
+                await file.Data.CopyToAsync(msFile);
+
+                var reader = new StreamReader(file.Data);
+                var imageBase64Data = Convert.ToBase64String(msFile.ToArray());
+                imageDataURL = string.Format("data:image/png;base64,{0}", imageBase64Data);
+                isInvalidFileType = false;
+            }
+            else
+            {
+                isInvalidFileType = true;
+                imageDataURL = string.Empty;
+            }
+        }
+        else
+        {
+            isInvalidFileType = false;
+        }
+    }
 
 }

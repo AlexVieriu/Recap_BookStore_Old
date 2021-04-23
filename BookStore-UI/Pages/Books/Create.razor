@@ -6,6 +6,7 @@
 @inject IAuthorRepository _authorRepo
 @inject IFileUpload _fileUpload
 @inject NavigationManager _navManager
+@inject IToastService _toastService
 
 
 <h4>Create Book</h4>
@@ -14,7 +15,7 @@
 
 @if (!isSuccess)
 {
-    <ErrorComponent Message="Couldn't create the Book" />   
+    <ErrorComponent Message="Couldn't create the Book" />
 }
 
 <EditForm Model="Book" OnValidSubmit="HandleCreate">
@@ -23,12 +24,12 @@
 
     <div class="form-group">
         <label for="title">Book Title</label>
-        <InputText id="title" class="form-control" @bind-Value="Book.Title" />
+        <InputText @bind-Value="Book.Title" id="title" class="form-control" />
     </div>
 
     <div class="form-group">
         <label for="isbn">ISBN</label>
-        <InputText id="isbn" class="form-control" @bind-Value="Book.Isbn" />
+        <InputText @bind-Value="Book.Isbn"id="isbn" class="form-control"  />
     </div>
 
     <div class="form-group">
@@ -38,16 +39,16 @@
 
     <div class="form-group">
         <label for="author">Authors</label>
-        <InputSelect Value="Book.AuthorId" class="form-control" id="author">
+        <select @bind="Book.AuthorId" class="form-control" id="author">
             <option value="">-- Select Author --</option>
-            @if (Authors is not null)
+            @if (Authors != null)
             {
                 foreach (var author in Authors)
                 {
                     <option value="@author.Id">@author.FirstName @author.LastName</option>
                 }
             }
-        </InputSelect>
+        </select>
     </div>
 
     <div class="form-group">
@@ -68,27 +69,26 @@
         }
     </div>
 
-
-
-    <button class="btn btn-outline-success" type="submit">
-        <span class="oi oi-pencil"></span> Create Book
+    <button class="btn btn-primary" type="submit">
+        <span class="oi oi-pencil"></span>
+        Create Book
     </button>
 
-    <button @onclick="BackToList" class="btn btn-outline-secondary">
+    <a href="/books" class="btn btn-outline-secondary">
         <span class="oi oi-media-skip-backward"></span>
         Back To List
-    </button>
+    </a>
 </EditForm>
 
 
 @code{
-    public BookModel Book { get; set; }
-    public IList<AuthorModel> Authors { get; set; }
-
+    public BookModel Book = new();
+    public IList<AuthorModel> Authors;
     private IFileListEntry file;
     private bool isSuccess = true;
     private bool isInvalidFileType = false;
     private string imageDataURL;
+    private MemoryStream msFile;
 
 
     protected override async Task OnInitializedAsync()
@@ -98,37 +98,43 @@
 
     private async Task HandleCreate()
     {
-        var ext = Path.GetExtension(file.Name);
-        var pickId = Guid.NewGuid().ToString().Replace("-","");
-        var picName = $"{pickId}{ext}";
-
-        await _fileUpload.UploadFile(file, picName);
-
-        Book.Image = picName;
-
         if (!isInvalidFileType)
         {
+            if (file != null)
+            {
+                var ext = Path.GetExtension(file.Name);
+                var pickId = Guid.NewGuid().ToString().Replace("-", "");
+                var picName = $"{pickId}{ext}";
+
+                _fileUpload.UploadFile(file, msFile, picName);
+
+                Book.Image = picName;
+            }
+
             isSuccess = await _bookRepo.Create(Endpoints.BookUrl, Book);
 
             if (isSuccess)
-                BackToList();
+            {
+                _toastService.ShowSuccess("Book Created Successfully", "");
+                _navManager.NavigateTo("/books");
+            }
         }
     }
 
     private async Task HandleFileSelection(IFileListEntry[] files)
     {
         file = files.FirstOrDefault();
-        if (file is not null)
+        if (file != null)
         {
             var name = file.Name;
             if (name.Contains("jpg") || name.Contains("png") || name.Contains("jpeg"))
             {
-                var ms = new MemoryStream();
-                await file.Data.CopyToAsync(ms);
+                msFile = new MemoryStream();
+                await file.Data.CopyToAsync(msFile);
 
                 var reader = new StreamReader(file.Data);
-                var imageBase64Data = Convert.ToBase64String(ms.ToArray());
-                imageDataURL = string.Format("data:image/png:base64,{0}", imageBase64Data);
+                var imageBase64Data = Convert.ToBase64String(msFile.ToArray());
+                imageDataURL = string.Format("data:image/png;base64,{0}", imageBase64Data);
                 isInvalidFileType = false;
             }
             else
@@ -141,10 +147,5 @@
         {
             isInvalidFileType = false;
         }
-    }
-
-    private void BackToList()
-    {
-        _navManager.NavigateTo("/books");
     }
 }

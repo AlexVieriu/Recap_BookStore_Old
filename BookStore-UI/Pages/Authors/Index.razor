@@ -1,8 +1,6 @@
 ﻿@page "/authors"
 
-
 @inject IAuthorRepository _authRepo
-@inject NavigationManager _navManager
 
 @if (Authors == null)
 {
@@ -14,7 +12,7 @@ else
     <br />
 
     <AuthorizeView Roles="Administrator">
-        <a href="/authors/create" class="btn btn-outline-success col-3" @onclick="NavigateToCreatePage">
+        <a href="/authors/create" class="btn btn-outline-success col-3">
             <span class="oi oi-plus"></span> Create New Author
         </a>
         <br />
@@ -31,7 +29,7 @@ else
     else
     {
         <br />
-        <table class="table">
+        <table class="table table-responsive">
             <thead>
                 <tr>
                     <th>FirstName</th>
@@ -75,8 +73,4 @@ else
         Authors = await _authRepo.GetAll(Endpoints.AuthorUrl);
     }
 
-    private void NavigateToCreatePage()
-    {
-        _navManager.NavigateTo("/authors/create");
-    }
 }

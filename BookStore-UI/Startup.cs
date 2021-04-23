@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.IdentityModel.Tokens.Jwt;
-using BookStore_UI.Pages.Books;
+using Blazored.Toast;
 
 namespace BookStore_UI
 {
@@ -30,6 +30,7 @@ namespace BookStore_UI
             services.AddServerSideBlazor();
             services.AddHttpClient();
             services.AddBlazoredLocalStorage();
+            services.AddBlazoredToast();
 
             services.AddScoped<ApiAuthenticationStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(p => 
