@@ -3,6 +3,7 @@ using BookStore_API.Data;
 using BookStore_API.DTOs;
 using BookStore_API.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,21 +14,27 @@ namespace BookStore_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class BooksController : ControllerBase
     {
         private readonly IBookRepository _bookRepository;
         private readonly ILoggerService _logger;
         private readonly IMapper _mapper;
+        private readonly IWebHostEnvironment _environment;
 
         public BooksController(IBookRepository bookRepository,
-                              ILoggerService logger,
-                              IMapper mapper)
+                               ILoggerService logger,
+                               IMapper mapper,
+                               IWebHostEnvironment environment)
         {
             _bookRepository = bookRepository;
             _logger = logger;
             _mapper = mapper;
+            _environment = environment;
         }
+
+        private string GetImagePath(string fileName)
+            => ($"{_environment.ContentRootPath}\\uploads\\{fileName}");
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -83,7 +90,7 @@ namespace BookStore_API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrator")]
+        //[Authorize(Roles = "Administrator")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -125,7 +132,7 @@ namespace BookStore_API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = "Administrator")]
+        //[Authorize(Roles = "Administrator")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -174,7 +181,7 @@ namespace BookStore_API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = "Administrator")]
+        //[Authorize(Roles = "Administrator")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -2,7 +2,7 @@
 
 namespace BookStore_UI.Models
 {
-    public class BookModel
+    public class Book
     {
         public int Id { get; set; }
         [Required]
@@ -15,7 +15,8 @@ namespace BookStore_UI.Models
         public string Image { get; set; }
         public decimal? Price { get; set; }
         [Required]
-        public int AuthorId { get; set; }
-        public virtual AuthorModel Author { get; set; }
+        public int? AuthorId { get; set; }
+        public virtual Author Author { get; set; }
+        public string File { get; set; }
     }
 }

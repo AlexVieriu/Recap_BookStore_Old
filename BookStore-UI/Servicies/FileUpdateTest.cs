@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace BookStore_UI.Servicies
 {
-    public class FileUpload : IFileUpload
+    public class FileUpdateTest : IFileUpload
     {
         private readonly IWebHostEnvironment _webHost;
 
-        public FileUpload(IWebHostEnvironment webHost)
+        public FileUpdateTest(IWebHostEnvironment webHost)
         {
             _webHost = webHost;
         }
@@ -17,9 +17,8 @@ namespace BookStore_UI.Servicies
         public void RemoveFile(string picName)
         {
             var path = $"{_webHost.WebRootPath}\\images\\{picName}";
-            if (File.Exists(path))           
+            if (File.Exists(path))
                 File.Delete(path);
-
         }
 
         public async Task UploadFile(Stream file, string picName)
@@ -28,6 +27,7 @@ namespace BookStore_UI.Servicies
             var buffer = new byte[4 * 1096];
             int bytesRead;
             double totalRead = 0;
+
             using FileStream fs = new FileStream(path, FileMode.Create);
 
             while ((bytesRead = await file.ReadAsync(buffer)) != 0)

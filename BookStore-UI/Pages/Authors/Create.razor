@@ -4,50 +4,51 @@
 
 @inject IAuthorRepository _authorRepo
 @inject IToastService _toastService
+@inject NavigationManager _navManager
 
 
 <h4>Create Author</h4>
+<br />
 @if (!isSuccess)
 {
     <ErrorComponent Message="Something Went Wrong With the Operation" />
 }
 
 
-<div class="card col-6 p-4">
-    <EditForm Model="Author" OnValidSubmit="OnCreateSubmit">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+<EditForm Model="Author" OnValidSubmit="OnCreateSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-        <div class="form-group">
-            <label for="firstname">First Name</label>
-            <InputText class="form-control" @bind-Value="Author.FirstName" id="firstname" />
-            <ValidationMessage For="@(()=> Author.FirstName)" />
-        </div>
+    <div class="form-group">
+        <label for="firstname" class="font-weight-bold">First Name</label>
+        <InputText class="form-control" @bind-Value="Author.FirstName" id="firstname" />
+        <ValidationMessage For="@(()=> Author.FirstName)" />
+    </div>
 
-        <div class="form-group">
-            <label for="lastname">Last Name</label>
-            <InputText class="form-control" @bind-Value="Author.LastName" id="lastname" />
-            <ValidationMessage For="@(()=> Author.LastName)" />
-        </div>
+    <div class="form-group">
+        <label for="lastname" class="font-weight-bold">Last Name</label>
+        <InputText class="form-control" @bind-Value="Author.LastName" id="lastname" />
+        <ValidationMessage For="@(()=> Author.LastName)" />
+    </div>
 
-        <div class="form-group">
-            <label for="bio">Biography</label>
-            <InputTextArea class="form-control" @bind-Value="Author.Bio" id="bio" />
-            <ValidationMessage For="@(()=> Author.Bio)" />
-        </div>
+    <div class="form-group">
+        <label for="bio" class="font-weight-bold">Biography</label>
+        <InputTextArea class="form-control" @bind-Value="Author.Bio" id="bio" />
+        <ValidationMessage For="@(()=> Author.Bio)" />
+    </div>
 
-        <input type="submit" class="btn btn-primary m-1" value="Create Author" />
-    </EditForm>
-</div>
+    <input type="submit" class="btn btn-primary m-1" value="Create Author" />
+</EditForm>
+
 
 <br />
-<a href="/authors" class="btn btn-secondary" >
+<a href="/authors" class="btn btn-outline-secondary col-3">
     <span class="oi oi-media-step-backward"></span> Back To List
 </a>
 
 
 @code{
-    public AuthorModel Author { get; set; } = new();
+    public Author Author { get; set; } = new();
     private bool isSuccess = true;
 
     private async Task OnCreateSubmit()
@@ -57,11 +58,10 @@
         if (isSuccess)
         {
             _toastService.ShowSuccess("Author Created Succeesfully");
-            BackToList();
+            _navManager.NavigateTo("/authors");
         }
         else
             _toastService.ShowError("Author wasn't created");
 
     }
-
 }

@@ -16,7 +16,7 @@ namespace BookStore_API.Controllers
     /// </summary>    
     [Route("api/[controller]")]
     [ApiController]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize]
     public class AuthorsController : ControllerBase
     {
         private readonly IAuthorRepository _authorRepository;
@@ -67,7 +67,7 @@ namespace BookStore_API.Controllers
         /// <param name="id"></param>
         /// <returns>An Author's record</returns>
         [HttpGet("{id:int}")]
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Administrator,Customer")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -20,7 +20,7 @@ else if (Book == null)
 }
 else
 {
-    _toastService.ShowInfo($"Now Viewwing{Book.Title}", "");
+    _toastService.ShowInfo($"Now Viewing - {Book.Title}", "");
 
     <div class="row">
         <div class="col-6">
@@ -30,6 +30,7 @@ else
                     <td>@Book.Title</td>
                 </tr>
                 <tr>
+                    <td><strong>Author</strong></td>
                     <td>
                         @if (Book.Author == null)
                         {
@@ -87,7 +88,7 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private BookModel Book = new();
+    private Book Book = new();
 
     protected override async Task OnInitializedAsync()
     {

@@ -17,7 +17,7 @@
 else
 {
     <AuthorizeView Roles="Administrator">
-        <a href="/books/create" class="btn btn-outline-success col-4">
+        <a href="books/create" class="btn btn-outline-success col-4">
             <span class="oi oi-plus"></span> Create New Book
         </a>
         <br />
@@ -56,9 +56,8 @@ else
                         <a href="/books/view/@book.Id" class="btn btn-primary">
                             <span class="oi oi-book"></span> View
                         </a>
-
                         <AuthorizeView Roles="Administrator">
-                            <a href="/books/update/@book.Id" class="btn btn-info">
+                            <a href="/books/update/@book.Id" class="btn btn-warning">
                                 <span class="oi oi-pencil"></span> Update
                             </a>
                             <a href="/books/delete/@book.Id" class="btn btn-danger">
@@ -74,7 +73,7 @@ else
 
 
 @code{
-    public IList<BookModel> Books;
+    public IList<Book> Books;
 
     protected override async Task OnInitializedAsync()
     {

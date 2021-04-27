@@ -58,7 +58,7 @@
 
     <div class="form-group">
         <label for="bookcover">Book Cover Photo</label>
-        <BlazorInputFile.InputFile OnChange="HandleFileSelection" />
+        <InputFile OnChange="HandleFileSelection" />
         @if (isInvalidFileType)
         {
             <ErrorComponent Message="The file is not a image, please select a image" />
@@ -82,13 +82,13 @@
 
 
 @code{
-    public BookModel Book = new();
-    public IList<AuthorModel> Authors;
-    private IFileListEntry file;
+    public Book Book = new();
+    public IList<Author> Authors;
+    private IBrowserFile file;
     private bool isSuccess = true;
     private bool isInvalidFileType = false;
     private string imageDataURL;
-    private MemoryStream msFile;
+    private Stream sFile;
 
 
     protected override async Task OnInitializedAsync()
@@ -103,10 +103,10 @@
             if (file != null)
             {
                 var ext = Path.GetExtension(file.Name);
-                var pickId = Guid.NewGuid().ToString().Replace("-", "");
-                var picName = $"{pickId}{ext}";
+                var picId = Guid.NewGuid().ToString().Replace("-", "");
+                var picName = $"{picId}{ext}";
 
-                _fileUpload.UploadFile(file, msFile, picName);
+                await _fileUpload.UploadFile(sFile, picName);
 
                 Book.Image = picName;
             }
@@ -121,19 +121,22 @@
         }
     }
 
-    private async Task HandleFileSelection(IFileListEntry[] files)
+    private async Task HandleFileSelection(InputFileChangeEventArgs e)
     {
-        file = files.FirstOrDefault();
+        file = e.File;
         if (file != null)
         {
-            var name = file.Name;
-            if (name.Contains("jpg") || name.Contains("png") || name.Contains("jpeg"))
+            var ext = Path.GetExtension(file.Name);
+            if (ext.Contains("jpg") || ext.Contains("png") || ext.Contains("jpeg"))
             {
-                msFile = new MemoryStream();
-                await file.Data.CopyToAsync(msFile);
+                sFile = file.OpenReadStream();
 
-                var reader = new StreamReader(file.Data);
-                var imageBase64Data = Convert.ToBase64String(msFile.ToArray());
+                var resizedImageFile = await file.RequestImageFileAsync("image/png", 30, 30);
+
+                var buffer = new byte[resizedImageFile.Size];
+                await resizedImageFile.OpenReadStream().ReadAsync(buffer);
+
+                var imageBase64Data = Convert.ToBase64String(buffer);
                 imageDataURL = string.Format("data:image/png;base64,{0}", imageBase64Data);
                 isInvalidFileType = false;
             }

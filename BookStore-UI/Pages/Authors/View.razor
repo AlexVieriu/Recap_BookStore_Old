@@ -1,5 +1,6 @@
 ﻿@page "/authors/view/{id:int}"
 
+
 @inject IAuthorRepository _authRepo
 
 @if (Author == null)
@@ -11,8 +12,8 @@ else
     <h4>Author View</h4>
     <br />
 
-    <table class="table">
-        <tbody>
+    <table class="table table-responsive">
+        <tbody class="thead-light">
             <tr>
                 <td><strong>First Name</strong></td>
                 <td>@Author.FirstName</td>
@@ -52,19 +53,21 @@ else
     }
     <br />
 
-    <a href="/authors/edit/@Author.Id" class="btn btn-outline-warning m-2">
-        <span class="oi oi-pencil"></span>
-        Edit Author
-    </a>
+    <div class="row">
+        <a href="/authors/edit/@Author.Id" class="btn btn-outline-warning col m-2">
+            <span class="oi oi-pencil"></span>
+            Edit Author
+        </a>
 
-    <a href="/authors/delete/@Author.Id" class="btn btn-outline-danger m-2">
-        <span class="oi oi-circle-x"></span>
-        Delete Author
-    </a>
+        <a href="/authors/delete/@Author.Id" class="btn btn-outline-danger col m-2">
+            <span class="oi oi-circle-x"></span>
+            Delete Author
+        </a>
 
-    <a href="/authors" class="btn btn-secondary m-2">
-        <span class="oi oi-media-skip-backward"></span> Back to List
-    </a>
+        <a href="/authors" class="btn btn-outline-secondary col m-2">
+            <span class="oi oi-media-skip-backward"></span> Back to List
+        </a>
+    </div>
 }
 
 
@@ -72,7 +75,7 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private AuthorModel Author = new();
+    private Author Author = new();
 
     protected override async Task OnInitializedAsync()
     {

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BookStore_UI.Models
 {
-    public class AuthorModel
+    public class Author
     {
         public int Id { get; set; }
         [Required]
@@ -18,6 +18,6 @@ namespace BookStore_UI.Models
         [StringLength(250)]
         public string Bio { get; set; }
 
-        public virtual IList<BookModel> Books { get; set; }
+        public virtual IList<Book> Books { get; set; }
     }
 }

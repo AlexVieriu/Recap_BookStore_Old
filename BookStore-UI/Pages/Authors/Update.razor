@@ -13,9 +13,9 @@
 {
     <ErrorComponent Message="The Author could not be saved" />
     <br />
-    <button class="btn btn-secondary" @onclick="BackToList">
+    <a href="/authors" class="btn btn-outline-secondary">
         <span class="oi oi-media-step-backward"></span> Back To List
-    </button>
+    </a>
 }
 
 @if (Id < 1)
@@ -58,7 +58,7 @@ else
     <br />
 
     <br />
-    <a href="/authors" class="btn btn-secondary" >
+    <a href="/authors" class="btn btn-secondary">
         <span class="oi oi-media-step-backward"></span> Back To List
     </a>
 }
@@ -69,7 +69,7 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    public AuthorModel authorModel = new();
+    public Author authorModel = new();
     public bool isSuccess = true;
 
 

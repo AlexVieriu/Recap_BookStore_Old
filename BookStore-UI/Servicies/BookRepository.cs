@@ -5,7 +5,7 @@ using System.Net.Http;
 
 namespace BookStore_UI.Servicies
 {
-    public class BookRepository : BaseRepository<BookModel>, IBookRepository
+    public class BookRepository : BaseRepository<Book>, IBookRepository
     {
         private readonly IHttpClientFactory _factory;
         private readonly ILocalStorageService _localStorage;

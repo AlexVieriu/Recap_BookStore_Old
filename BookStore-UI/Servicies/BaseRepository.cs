@@ -87,19 +87,29 @@ namespace BookStore_UI.Servicies
 
         public async Task<T> GetbyId(string url, int id)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url + id);
-
-            var client = _client.CreateClient();
-            client.DefaultRequestHeaders.Authorization = await HeaderValue();
-
-            HttpResponseMessage response = await client.SendAsync(request);
-            if (response.StatusCode == HttpStatusCode.OK)
+            try
             {
-                var content = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<T>(content);
-            }
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url+id);
 
-            return null;
+                var client = _client.CreateClient();
+                client.DefaultRequestHeaders.Authorization = await HeaderValue();
+
+                HttpResponseMessage response = await client.SendAsync(request);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<T>(content);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            
         }
 
         public async Task<bool> Update(string url, T obj, int id)

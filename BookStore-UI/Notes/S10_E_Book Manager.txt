@@ -53,16 +53,224 @@ UI:
 </a>
 
 
-62. Setup Create Book - Part 1
+62-63. Setup Create Book
 
 -> DropDownList		: https://www.youtube.com/watch?v=wf9oQ6-fttM&ab_channel=BrianLagunas
 -> BlazorInputFile	:
 
+UI:
+
 @attribute [Authorize(Role = Administrator)]
 
--> IBookRepository, IAuthorRepository
+IBookRepository, IAuthorRepository, IFileUpload, NavigationManager, IToastService
 
--> <EditForm>: 3 form-group : Title, Isbn, Price, Author(DropDownList)
+if(!isSuccess)
 
+<EditForm> -> Title, ISBN, Price, Authors (<select>, Authors!= null), Summary
+			  <img> : if(isInvalidFileType), if(!string.IsNullOrWhiteSpace(imageDataURL)), 
+
+			-> <button type="submit"> Create Book
+			-> BackToList
+
+Code:
+
+public Book Book = new();
+public IList<Author> Authors;
+private IBrowserFile file;
+private bool isSuccess = true;
+private bool isInvalidFileType = false;
+private string imageDataURL;
+private Stream msFile;
+
+
+-> OnInitializedAsync()
+	-> get Books
+
+-> HandleCreate()
+	-> check if the isInvalidFileType == false
+		-> check if file is null
+			-> get the extention of the fileName
+			-> create pic Id with a new GUID, replace "-" from the guid
+			-> picName= id + extention
+
+			-> UploadFile(sFile, picName);;
+			-> Book.Image = picName
+
+		-> _repoBook.Create(...);
+		-> if(isSuccess)
+			-> use toastService to show Create Succeded
+
+
+-> HandleFileSelection(InputFileChangeEventArgs e)
+	-> get the file 
+	-> check it the file is not null
+		-> get the extention of the file
+		-> check if the extention is : "jpg", "png", "jpeg"
+			-> sFile = file.OpenReadStream();
+			-> resizedImageFile
+
+			-> var buffer = new byte[resizedImageFile.Size];
+			-> await resizedImageFile.OpenReadStream().ReadAsync(buffer);
+
+			-> convert img into ToBase64String
+			-> change the imageBase64Data fromat: string.Format("data:image/png;base64,{0}", imageBase64Data);
+			-> isInvalidFileType = false;
+		-> else:
+			-> isInvalidFileType = true;
+			-> imageDataURL = string.Empty;
+	-> else 
+		-> isInvalidFileType = false;
+
+
+-- BookStore_UI.Servicies  --
+
+-- IFileUpload.cs --
+
+public Task UploadFile(Stream file, string picName);
+public void RemoveFile(string picName);
+
+
+-- FileUpload.cs --
+
+RemoveFile():
+-> get the path
+-> if the path Exists, Delete it
+
+
+UploadFile();
+-> get the path
+-> create a buffer , bytesRead, totalRead, FileStream(path, FileMode.Create);
+-> while(bytesRead != 0)
+	totalRead += bytesRead;
+	await fs.WriteAsync(buffer);
+
+
+Dictionary:
+
+using Microsoft.AspNetCore.Hosting;
+
+IHostEnvironment: Provides information about the hosting environment an application is running in
+-> ApplicationName 
+-> ContentRootFileProvider
+-> ContentRootPath 
+-> EnvironmentName
+
+IWebHostEnvironment: Provides information about the web hosting environment an application is running in
+-> WebRootPath
+-> WebRootFileProvider
+
+
+using System.IO;
+
+File:  Provides static methods for the creation, copying, deletion, moving, and opening 
+	   of a single file, and aids in the creation of System.IO.FileStream objects
+	   
+-> ReadAllText	: Opens a text file, reads all the text in the file, and then closes the file.
+-> WriteAllText : Creates a new file, writes the specified string to the file, and then closes
+				  the file. If the target file already exists, it is overwritten.
+-> Move			: 
+-> Delete
+-> Exists
+
+Stream: Provides a generic view of a sequence of bytes. This is an abstract class.
+
+Methods:
+-> Read  : When overridden in a derived class, reads a sequence of bytes from the current
+		   stream and advances the position within the stream by the number of bytes read.
+
+-> Write : When overridden in a derived class, writes a sequence of bytes to the current
+           stream and advances the current position within this stream by the number of
+           bytes written.
+
+-> Seek  : When overridden in a derived class, sets the position within the current stream.
+
+-> Flush : When overridden in a derived class, clears all buffers for this stream and causes
+           any buffered data to be written to the underlying device.
+
+-> CopyTo: Reads the bytes from the current stream and writes them to another stream.
+
+Properties:
+-> Position	: When overridden in a derived class, gets or sets the position within the current stream
+-> Lenght	: When overridden in a derived class, gets the length in bytes of the stream.
+
+
+FileStream: Initializes a new instance of the System.IO.FileStream class with the specified
+			path and creation mode.
+
+
+
+64. Setup Update Book
+
+UI:
+
+@attribute [Authorize(Roles = "Administrator")]
+
+IBookRepository, IAuthorRepository, IFileUpload, NavigationManager, IToastService
+
+if(!isSuccess)
+if(Id<1)
+if(BookModel == null)
+else
+	<EditForm> -> Title, ISBN, Price, Authors (<select>, Authors!= null), Summary
+				 <img> : if(isInvalidFileType), if(!string.IsNullOrWhiteSpace(imageDataURL)), 
+						 if (!string.IsNullOrWhiteSpace(Model.Image))	 
+
+			  -> <button type="submit"> Submit Changes
+			  -> BackToList
+
+Code:
+[Parameter] Id
+
+private Book Model = new Book();
+private IList<Author> Authors;
+private IFileListEntry file;
+private bool isSuccess = true;
+private bool isInvalidFileType = false;
+private bool isFileChanged = false;
+private string imageDataURL;
+
+-> OnInitializedAsync()
+	-> get Model
+	-> get Authors
+
+-> HandleUpdate()
+	-> check if the isInvalidFileType == false
+		-> check if file is null
+			-> get the extention of the fileName
+			-> create pic Id with a new GUID, replace "-" from the guid
+			-> picName= id + extention
+
+			-> remove image from Book.Image
+			-> UpLoadFile(file,picName);
+			-> Book.Image = picName
+		else
+			-> if(isFileChanged && file == null)
+				-> removeFile
+				-> Book.Image = string.Empty
+		-> _repoBook.Update(...);
+		-> if(isSuccess)
+			-> use toastService to show Update Succeded
+
+
+-> HandleFileSelection(IFileListEntry[] files)
+	-> get the first file
+	-> check it the File is no null
+		-> get the name of the file
+		-> check if the extention is : "jpg", "png", "jpeg"
+			-> create a MemoryStream obj so we can Copy the Data from the Image
+			-> copy the data from the Image
+
+			-> create a StreamReader object with the file.Data in it
+			-> convert img to Base64String
+			-> change the imageBase64Data fromat: string.Format("data:image/png;base64,{0}", imageBase64Data);
+			-> isInvalidFileType = false;
+		-> else:
+			-> isInvalidFileType = true;
+			-> imageDataURL = string.Empty;
+	-> else 
+		-> isInvalidFileType = false;
+
+
+65. Setup Delete Book
 
 

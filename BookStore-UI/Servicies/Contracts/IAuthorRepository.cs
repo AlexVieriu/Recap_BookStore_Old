@@ -2,7 +2,7 @@
 
 namespace BookStore_UI.Servicies.Contracts
 {
-    public interface IAuthorRepository : IBaseRepository<AuthorModel> 
+    public interface IAuthorRepository : IBaseRepository<Author> 
     {
     }
 }
