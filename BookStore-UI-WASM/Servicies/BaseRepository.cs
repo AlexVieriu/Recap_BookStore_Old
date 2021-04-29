@@ -84,10 +84,7 @@ namespace BookStore_UI_WASM.Servicies
 
            var response = await _client.PutAsJsonAsync<T>(url+id, obj);
 
-            if (response.StatusCode == HttpStatusCode.OK)
-                return true;
-
-            return false;
+            return response.IsSuccessStatusCode;
         }
 
         private async Task<AuthenticationHeaderValue> HeaderValue()

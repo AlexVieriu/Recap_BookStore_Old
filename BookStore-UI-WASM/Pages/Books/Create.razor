@@ -4,7 +4,6 @@
 
 @inject IBookRepository _bookRepo
 @inject IAuthorRepository _authorRepo
-@inject IFileUpload _fileUpload
 @inject NavigationManager _navManager
 @inject IToastService _toastService
 
@@ -52,7 +51,7 @@
     </div>
 
     <div class="form-group">
-        <label for="summary">Sumarry</label>
+        <label for="summary">Summary</label>
         <InputTextArea @bind-Value="Book.Summary" class="form-control" id="summary" />
     </div>
 
@@ -105,10 +104,12 @@
                 var ext = Path.GetExtension(file.Name);
                 var picId = Guid.NewGuid().ToString().Replace("-", "");
                 var picName = $"{picId}{ext}";
-
-                await _fileUpload.UploadFile(sFile, picName);
-
+                
                 Book.Image = picName;
+                var buffer = new byte[file.Size];
+                await file.OpenReadStream().ReadAsync(buffer);
+                Book.File = Convert.ToBase64String(buffer);
+
             }
 
             isSuccess = await _bookRepo.Create(Endpoints.BookUrl, Book);
@@ -131,7 +132,7 @@
             {
                 sFile = file.OpenReadStream();
 
-                var resizedImageFile = await file.RequestImageFileAsync("image/png", 30, 30);
+                var resizedImageFile = await file.RequestImageFileAsync("image/png", 90, 90);
 
                 var buffer = new byte[resizedImageFile.Size];
                 await resizedImageFile.OpenReadStream().ReadAsync(buffer);

@@ -32,10 +32,119 @@ builder.Services.AddAuthorizationCore();
 
 <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
 
-
+-> extend our API
+-> UploadFile to the API
 
 
 73. File Upload Support (Create and View)
+
+-> add prop File to classes: 
+
+BookStore-API : BookDTO, BookCreateDTO, BookUpdateDTO
+
+BookStore-UI, BookStore-UI-WASM : Book.cs
+
+-- BookStore-API --
+-> create Upload file for the images
+
+
+-- BookStore-UI-WASM -> Pages -> Books --
+
+Create.razor:
+-> delete _fileUpload
+
+-> HandleCreate()
+	var ext = Path.GetExtension(file.Name);
+    var picId = Guid.NewGuid().ToString().Replace("-", "");
+    var picName = $"{picId}{ext}";
+                
+    Book.Image = picName;
+    var buffer = new byte[file.Size];
+    await file.OpenReadStream().ReadAsync(buffer);
+    Book.File = Convert.ToBase64String(buffer);
+
+-> HandleFileSelection()
+    sFile = file.OpenReadStream();
+
+    var resizedImageFile = await file.RequestImageFileAsync("image/png", 90, 90);
+
+    var buffer = new byte[resizedImageFile.Size];
+    await resizedImageFile.OpenReadStream().ReadAsync(buffer);
+
+    var imageBase64Data = Convert.ToBase64String(buffer);
+    imageDataURL = string.Format("data:image/png;base64,{0}", imageBase64Data);
+    isInvalidFileType = false;
+
+
+View.razor:
+-> <img src="@string.Format("data:image/png;base64,{0}", Book.File)" style="height:300px; width:300px" />
+
+
+-- BookStore-API --
+
+IBookRepository.cs  : Task<string> GetImageFileName(int id)
+BookRepository.cs   : Task<string> GetImageFileName(int id)
+
+{
+    var book = await _db.Books.AsNoTracking()
+                              .FirstOrDefaultAsync(q => q.Id == id);
+    return book.Image;
+}
+
+
+-- BooksController.cs --
+
+private string GetFileImg(string image)
+{
+    if (!string.IsNullOrWhiteSpace(image))
+    {
+        var imgPath = $"{_environment.ContentRootPath}\\images\\{image}";
+        if (System.IO.File.Exists(imgPath))
+        {
+            byte[] imgBytes = System.IO.File.ReadAllBytes(imgPath);
+            var file = Convert.ToBase64String(imgBytes);
+            return file;
+        }
+    }
+
+    return string.Empty;
+}
+
+private void StoreFileImg(string file, string image, string oldImage)
+{
+    if (image.Equals(oldImage))
+    {
+        if (System.IO.File.Exists($"{_environment.ContentRootPath}\\images\\{oldImage}"))
+        {
+            System.IO.File.Delete($"{_environment.ContentRootPath}\\images\\{oldImage}");
+        }
+    }
+
+    if (!string.IsNullOrEmpty(file))
+    {
+        var imgPath = $"{_environment.ContentRootPath}\\images\\{image}";
+        byte[] imageBytes = Convert.FromBase64String(file);
+        System.IO.File.WriteAllBytes(imgPath, imageBytes);
+    }
+}
+
+
+-> GetAllBooks():  
+foreach (var item in booksDTO)
+{
+    item.File = GetFileImg(item.Image);
+}
+
+-> GetBookById(int id): 
+bookDTO.File = GetFileImg(bookDTO.Image);
+
+-> Create()
+StoreFileImg(bookCreateDTO.File, bookCreateDTO.Image, "");
+
+-> Update()
+var oldImage = await _bookRepository.GetImageFileName(id);
+StoreFileImg(bookCreateDTO.File, bookCreateDTO.Image, oldImage);
+
 
 74. File Upload Support (List and Edit)
 

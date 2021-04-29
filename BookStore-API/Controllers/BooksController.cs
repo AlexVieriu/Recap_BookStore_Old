@@ -12,9 +12,12 @@ using System.Threading.Tasks;
 
 namespace BookStore_API.Controllers
 {
+    /// <summary>
+    /// Interacts with the Books Table
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class BooksController : ControllerBase
     {
         private readonly IBookRepository _bookRepository;
@@ -33,9 +36,10 @@ namespace BookStore_API.Controllers
             _environment = environment;
         }
 
-        private string GetImagePath(string fileName)
-            => ($"{_environment.ContentRootPath}\\uploads\\{fileName}");
-
+        /// <summary>
+        /// Get All Books
+        /// </summary>
+        /// <returns>A List of Books</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -49,6 +53,11 @@ namespace BookStore_API.Controllers
                 var books = await _bookRepository.FindAll();
                 var booksDTO = _mapper.Map<IList<BookDTO>>(books);
 
+                foreach (var item in booksDTO)
+                {
+                    item.File = GetFileImg(item.Image);
+                }
+
                 _logger.LogInfo($"{location} : Succefull");
                 return Ok(booksDTO);
             }
@@ -58,6 +67,11 @@ namespace BookStore_API.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets a Book by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>A Book record</returns>
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -78,6 +92,7 @@ namespace BookStore_API.Controllers
 
                 var bookDTO = _mapper.Map<BookDTO>(book);
 
+                bookDTO.File = GetFileImg(bookDTO.Image);
 
                 _logger.LogInfo($"{location}: Successfully got record with id:{id}");
                 return Ok(bookDTO);
@@ -90,7 +105,7 @@ namespace BookStore_API.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -121,6 +136,8 @@ namespace BookStore_API.Controllers
                     return StatusCode(500, "Created failed");
                 }
 
+                StoreFileImg(bookCreateDTO.File, bookCreateDTO.Image, "");
+
                 _logger.LogInfo($"{ location}: Successfully created");
                 return Created("Create", new { bookCreateDTO });
             }
@@ -131,8 +148,14 @@ namespace BookStore_API.Controllers
             }
         }
 
+        /// <summary>
+        /// Update a Book by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="bookDTO"></param>
+        /// <returns></returns>
         [HttpPut("{id:int}")]
-        //[Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -163,6 +186,7 @@ namespace BookStore_API.Controllers
                     return BadRequest(ModelState);
                 }
 
+                var oldImage = await _bookRepository.GetImageFileName(id);
                 var book = _mapper.Map<Book>(bookUpdateDTO);
                 var isSuccess = await _bookRepository.Update(book);
 
@@ -170,6 +194,8 @@ namespace BookStore_API.Controllers
                 {
                     return StatusCode(500, $"{location}: Failed Update with id:{id}");
                 }
+
+                StoreFileImg(bookUpdateDTO.File, bookUpdateDTO.Image, oldImage);
 
                 _logger.LogInfo($"{location}: Update successful with id: {id}");
                 return Ok(book);
@@ -180,8 +206,13 @@ namespace BookStore_API.Controllers
             }
         }
 
+        /// <summary>
+        /// Removes an book by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id:int}")]
-        //[Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -235,6 +266,40 @@ namespace BookStore_API.Controllers
         {
             _logger.LogError($"{location}: {e.Message} - {e.InnerException}");
             return StatusCode(500, "Something went wront, contact the Administrator");
+        }
+
+        private string GetFileImg(string image)
+        {
+            if (!string.IsNullOrWhiteSpace(image))
+            {
+                var imgPath = $"{_environment.ContentRootPath}\\images\\{image}";
+                if (System.IO.File.Exists(imgPath))
+                {
+                    byte[] imgBytes = System.IO.File.ReadAllBytes(imgPath);
+                    var file = Convert.ToBase64String(imgBytes);
+                    return file;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private void StoreFileImg(string file, string image, string oldImage)
+        {
+            if (image.Equals(oldImage))
+            {
+                if (System.IO.File.Exists($"{_environment.ContentRootPath}\\images\\{oldImage}"))
+                {
+                    System.IO.File.Delete($"{_environment.ContentRootPath}\\images\\{oldImage}");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(file))
+            {
+                var imgPath = $"{_environment.ContentRootPath}\\images\\{image}";
+                byte[] imageBytes = Convert.FromBase64String(file);
+                System.IO.File.WriteAllBytes(imgPath, imageBytes);
+            }
         }
     }
 }
