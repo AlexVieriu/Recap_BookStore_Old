@@ -1,0 +1,108 @@
+﻿@page "/authors/delete/{Id:int}"
+
+@attribute [Authorize(Roles = "Administrator")]
+
+@inject IAuthorRepository _authRepo
+@inject NavigationManager _navManager
+@inject IToastService _toastService
+
+
+<h3 class="card-title">Are You Sure You Want to Delete This Record?</h3>
+<hr />
+<br />
+
+@if (isSuccess == false)
+{
+    <ErrorComponent Message="Coudn't delete the record" />
+}
+
+@if (Id < 1)
+{
+    <ErrorComponent Message="Id less then 1" />
+}
+
+@if (Author is null)
+{
+    <InfoComponent Message="Loading..." />
+}
+
+else
+{
+    <table class="table table-responsive">
+        <tbody>
+            <tr>
+                <td>First Name</td>
+                <td>@Author.FirstName</td>
+            </tr>
+            <tr>
+                <td>Last Name</td>
+                <td>@Author.LastName</td>
+            </tr>
+            <tr>
+                <td>biography</td>
+                <td>@Author.Bio</td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+
+    @if (Author.Books == null || Author.Books.Count < 1)
+    {
+        <div class="alert alert-dismissible alert-secondary">
+            No Books for this Author
+        </div>
+    }
+
+    else
+    {
+        <div class="card" style="width: 18rem;">
+            <div class="card-header">
+                <h4>Author's Books</h4>
+            </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var book in Author.Books)
+                {
+                    <li class="list-group-item">@book.Title - @book.Price </li>
+                }
+            </ul>
+        </div>
+    }
+
+    <button class="btn btn-danger col-3 m-2" @onclick="DeleteAuthor">
+        <span class="oi oi-delete"></span> Delete Author
+    </button>
+
+    <br />
+
+    <a href="/authors" class="btn btn-secondary" >
+        <span class="oi oi-media-step-backward"></span> Back To List
+    </a>
+}
+
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    public Author Author { get; set; }
+    private bool isSuccess = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Author = await _authRepo.GetbyId(Endpoints.AuthorUrl, Id);
+    }
+
+    public async Task DeleteAuthor()
+    {
+        isSuccess = await _authRepo.Delete(Endpoints.AuthorUrl, Id);
+
+        if (isSuccess)
+        {
+            _toastService.ShowSuccess("Author Deleted Succeesfully");
+            _navManager.NavigateTo("/authors");
+        }
+        else
+            _toastService.ShowError("Author wasn't deleted");
+    }
+
+}

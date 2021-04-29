@@ -1,0 +1,42 @@
+﻿69. Blazor WebAssembly Introduction
+
+-> creat a WASM project with Proggresive Web App checked
+
+
+70. Transferring Blazor Server Code to Blazor WASM
+
+-> Contracts, Models, Pages, Providers, Services, Shared, Static
+
+Error:  Unhandled exception rendering component: Cannot provide a value for property 
+'AuthorizationPolicyProvider' on type 'Microsoft.AspNetCore.Components.Authorization.AuthorizeRouteView+AuthorizeRouteViewCore'. 
+There is no registered service of type 'Microsoft.AspNetCore.Authorization.IAuthorizationPolicyProvider'.
+
+Solution: 
+
+-- Program.cs --
+
+builder.Services.AddOptions();
+builder.Services.AddAuthorizationCore();
+
+.AddOptions()			: Adds services required for using options
+.AddAuthorizationCore()	: Adds authorization services to the specified 
+						  Microsoft.Extensions.DependencyInjection.IServiceCollection
+
+
+71. Modify Code for Blazor WebAssembly
+
+
+72. Essential Layout Fixes and Additions
+
+-- wwwroot -> idex.html --
+
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
+
+
+
+
+73. File Upload Support (Create and View)
+
+74. File Upload Support (List and Edit)
+
+75. Progressive Web Application

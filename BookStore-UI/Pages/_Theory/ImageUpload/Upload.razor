@@ -1,0 +1,126 @@
+﻿@page "/test/update/{id:int}"
+
+@inject IBookRepository _bookRepo
+@inject IFileUploadTest _fileUpload
+@inject IToastService  _toast
+@inject NavigationManager _navManager
+
+<h3>Upload Book Img Cover</h3>
+<br />
+
+@if (Book == null)
+{
+    <InfoComponent Message="Loading..." />
+}
+else
+{
+<EditForm Model="Book" OnValidSubmit="HandleUpdate">
+
+    <div class="form-group">
+        <InputFile OnChange="HandleFileSelection" />
+        @if (isInvalidFileType)
+        {
+            <ErrorComponent Message="Invalid image" />
+        }
+        @if (!string.IsNullOrWhiteSpace(imageDataURL))
+        {
+            <img src="@imageDataURL" style="height:100px;width:100px" />
+        }
+        else if (!string.IsNullOrWhiteSpace(Book.Image))
+        {
+            <img src="images/@Book.Image" style="height:100px;width:100px" />
+        }
+    </div>
+
+    <button class="btn btn-primary" type="submit">
+        <span class="oi oi-pencil"></span>
+        Submit Changes
+    </button>
+
+</EditForm>
+}
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    private Book Book;
+    private IBrowserFile file;
+    private Stream sFile;
+    private bool isInvalidFileType = false;
+    private bool isFileChanged = false;
+    private string imageDataURL;
+    private bool isSuccess = true;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Book = await _bookRepo.GetbyId(Endpoints.BookUrl, Id);
+    }
+
+    private async Task HandleFileSelection(InputFileChangeEventArgs e)
+    {
+        file = e.File;
+        isFileChanged = true;
+        if (file != null)
+        {
+            var ext = Path.GetExtension(file.Name);
+            if (ext.Contains("jpg") || ext.Contains("png") || ext.Contains("jpeg"))
+            {
+                // image less the 10mb
+                sFile = file.OpenReadStream(10000000);
+
+                var resizedImageFile = await file.RequestImageFileAsync("image/png",
+            100, 100);
+
+                var buffer = new byte[resizedImageFile.Size];
+                await resizedImageFile.OpenReadStream().ReadAsync(buffer);
+
+                // pentru ca sa afisam img pe ecran inaite sa facem Update in db
+                var imageBase64Data = Convert.ToBase64String(buffer);
+                imageDataURL = string.Format("data:image/png;base64,{0}", imageBase64Data);
+                isInvalidFileType = false;
+            }
+            else
+            {
+                isInvalidFileType = true;
+                imageDataURL = string.Empty;
+            }
+        }
+        else
+        {
+            isInvalidFileType = false;
+        }
+    }
+
+    private async Task HandleUpdate()
+    {
+        if (!isInvalidFileType)
+        {
+            if (file != null)
+            {
+                var ext = Path.GetExtension(file.Name);
+                var picId = Guid.NewGuid().ToString().Replace("-", "");
+                var picName = $"{picId}{ext}";
+
+                _fileUpload.RemoveImg(Book.Image);
+                await _fileUpload.UploadImg(sFile, picName);
+
+                Book.Image = picName;
+            }
+            if (file == null || isFileChanged)
+            {
+                _fileUpload.RemoveImg(Book.Image);
+                Book.Image = string.Empty;
+            }
+
+
+            isSuccess = await _bookRepo.Update(Endpoints.BookUrl, Book, Book.Id);
+            if (isSuccess)
+            {
+                _toast.ShowSuccess("Book Updated Successfully");
+                _navManager.NavigateTo("/test");
+            }
+        }
+    }
+}

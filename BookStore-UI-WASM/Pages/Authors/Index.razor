@@ -1,0 +1,76 @@
+﻿@page "/authors"
+
+@inject IAuthorRepository _authRepo
+
+@if (Authors == null)
+{
+    <InfoComponent Message="Loding data..." />
+}
+else
+{
+    <h3>Authors List</h3>
+    <br />
+
+    <AuthorizeView Roles="Administrator">
+        <a href="/authors/create" class="btn btn-outline-success col-3">
+            <span class="oi oi-plus"></span> Create New Author
+        </a>
+        <br />
+        <br />
+    </AuthorizeView>
+    
+
+    @if (Authors.Count < 1)
+    {
+        <br />
+        <InfoComponent Message="There are no Authors in the DataBase, Create a New Author" />
+    }
+
+    else
+    {
+        <br />
+        <table class="table table-responsive">
+            <thead>
+                <tr>
+                    <th>FirstName</th>
+                    <th>LastName</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var author in Authors)
+                {
+                    <tr>
+                        <td>@author.FirstName</td>
+                        <td>@author.LastName</td>
+                        <td>
+                            <a href="/authors/view/@author.Id" class="btn btn-primary">
+                                <span class="oi oi-book"></span> View
+                            </a>
+                            <AuthorizeView Roles="Administrator">
+                                <a href="/authors/update/@author.Id" class="btn btn-warning">
+                                    <span class="oi oi-pencil"></span> Update
+                                </a>
+                                <a href="/authors/delete/@author.Id" class="btn btn-danger">
+                                    <span class="oi oi-delete"></span> Delete
+                                </a>
+                            </AuthorizeView>                                                           
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+
+@code{
+    private IList<Author> Authors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Authors = await _authRepo.GetAll(Endpoints.AuthorUrl);
+    }
+
+}

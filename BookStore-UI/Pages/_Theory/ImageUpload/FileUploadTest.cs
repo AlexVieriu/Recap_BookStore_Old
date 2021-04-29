@@ -1,37 +1,36 @@
-﻿
-using BookStore_UI.Servicies.Contracts;
+﻿using BookStore_UI.Servicies.Contracts;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace BookStore_UI.Servicies
+namespace BookStore_UI.Pages._Theory.ImageUpload
 {
-    public class FileUpload : IFileUpload
+    public class FileUploadTest : IFileUploadTest
     {
         private readonly IWebHostEnvironment _webHost;
 
-        public FileUpload(IWebHostEnvironment webHost)
+        public FileUploadTest(IWebHostEnvironment webHost)
         {
             _webHost = webHost;
         }
 
-        public void RemoveFile(string picName)
+        public void RemoveImg(string picName)
         {
             var path = $"{_webHost.WebRootPath}\\images\\{picName}";
-            if (File.Exists(path))           
+            if (File.Exists(path))
                 File.Delete(path);
         }
 
-        public async Task UploadFile(Stream file, string picName)
+        public async Task UploadImg(Stream file, string picName)
         {
             var path = $"{_webHost.WebRootPath}\\images\\{picName}";
-            // merge din 4,384 in 4,384 bites citirea
             var buffer = new byte[4 * 1096];
             int bytesRead;
             double totalRead = 0;
+
             using FileStream fs = new FileStream(path, FileMode.Create);
 
-            while ((bytesRead = await file.ReadAsync(buffer)) != 0)
+            while((bytesRead = await file.ReadAsync(buffer)) != 0)
             {
                 totalRead += bytesRead;
                 await fs.WriteAsync(buffer);

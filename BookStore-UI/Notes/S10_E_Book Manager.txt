@@ -56,8 +56,31 @@ UI:
 62-63. Setup Create Book
 
 -> DropDownList		: https://www.youtube.com/watch?v=wf9oQ6-fttM&ab_channel=BrianLagunas
--> BlazorInputFile	:
 
+-- BookStore_UI.Servicies --
+
+-- IFileUpload.cs --
+
+public Task UploadFile(Stream file, string picName);
+public void RemoveFile(string picName);
+
+
+-- FileUpload.cs --
+
+RemoveFile():
+-> get the path
+-> if the path Exists, Delete it
+
+
+UploadFile();
+-> get the path
+-> create a buffer , bytesRead, totalRead, FileStream(path, FileMode.Create);
+-> while(bytesRead != 0)
+	totalRead += bytesRead;
+	await fs.WriteAsync(buffer);
+
+
+-- Pages-> 
 UI:
 
 @attribute [Authorize(Role = Administrator)]
@@ -122,29 +145,6 @@ private Stream msFile;
 		-> isInvalidFileType = false;
 
 
--- BookStore_UI.Servicies  --
-
--- IFileUpload.cs --
-
-public Task UploadFile(Stream file, string picName);
-public void RemoveFile(string picName);
-
-
--- FileUpload.cs --
-
-RemoveFile():
--> get the path
--> if the path Exists, Delete it
-
-
-UploadFile();
--> get the path
--> create a buffer , bytesRead, totalRead, FileStream(path, FileMode.Create);
--> while(bytesRead != 0)
-	totalRead += bytesRead;
-	await fs.WriteAsync(buffer);
-
-
 Dictionary:
 
 using Microsoft.AspNetCore.Hosting;
@@ -169,10 +169,10 @@ File:  Provides static methods for the creation, copying, deletion, moving, and 
 -> WriteAllText : Creates a new file, writes the specified string to the file, and then closes
 				  the file. If the target file already exists, it is overwritten.
 -> Move			: 
--> Delete
--> Exists
+-> Delete		: 
+-> Exists		: 
 
-Stream: Provides a generic view of a sequence of bytes. This is an abstract class.
+Stream: Provides a generic view of a sequence of bytes. This is an abstract class
 
 Methods:
 -> Read  : When overridden in a derived class, reads a sequence of bytes from the current
@@ -197,6 +197,12 @@ Properties:
 FileStream: Initializes a new instance of the System.IO.FileStream class with the specified
 			path and creation mode.
 
+FileMode.CreateNew		: create new file, if the file exists throw exeption
+FileMode.Create			: create new file(CreateNew), if the file exists overwrite it(Truncate)
+FileMode.Open			: open the file, if doesn't exists throw exeption
+FileMode.OpenOrCreate	: open the file if exists, if not create it
+FileMode.Truncate		: open the file and after opening make the size 0 bytes
+FileMode.Append			: open a file if exists and seeks to the end of the file, or creates a new one
 
 
 64. Setup Update Book

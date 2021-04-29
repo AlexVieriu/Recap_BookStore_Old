@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.IdentityModel.Tokens.Jwt;
 using Blazored.Toast;
+using BookStore_UI.Pages._Theory.ImageUpload;
 
 namespace BookStore_UI
 {
@@ -41,6 +42,7 @@ namespace BookStore_UI
             services.AddTransient<IAuthorRepository, AuthorRepository>();
             services.AddTransient<IBookRepository, BookRepository>();
             services.AddTransient<IFileUpload, FileUpload>();
+            services.AddTransient<IFileUploadTest, FileUploadTest>();
 
         }
 

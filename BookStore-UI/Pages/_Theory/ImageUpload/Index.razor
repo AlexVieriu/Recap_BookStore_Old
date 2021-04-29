@@ -1,0 +1,34 @@
+﻿@page "/test"
+
+@inject IBookRepository _bookRepo
+
+
+<h3>Book Test</h3>
+<br />
+
+@if (Books == null)
+{
+    <InfoComponent Message="Loading..." />
+}
+else
+{
+    @foreach (var book in Books)
+    {
+        <div>
+            <img src="images/@book.Image"/>
+            <a href="/test/update/@book.Id" class="btn btn-primary m-2">
+                View
+            </a>
+        </div>
+    }
+
+}
+
+@code{
+    private IList<Book> Books;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Books = await _bookRepo.GetAll(Endpoints.BookUrl);
+    }
+}
