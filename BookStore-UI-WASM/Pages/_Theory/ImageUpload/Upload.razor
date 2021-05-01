@@ -1,5 +1,6 @@
 ﻿@page "/test/update/{id:int}"
 
+
 @inject IBookRepository _bookRepo
 @inject IFileUploadTest _fileUpload
 @inject IToastService  _toast
@@ -24,11 +25,11 @@ else
         }
         @if (!string.IsNullOrWhiteSpace(imageDataURL))
         {
-            <img src="@imageDataURL" style="height:100px;width:100px" />
+            <img src="@imageDataURL"/>
         }
         else if (!string.IsNullOrWhiteSpace(Book.Image))
         {
-            <img src="images/@Book.Image" style="height:100px;width:100px" />
+            <img src="@string.Format("data:image/png;base64,{0}", Book.File)"/>
         }
     </div>
 

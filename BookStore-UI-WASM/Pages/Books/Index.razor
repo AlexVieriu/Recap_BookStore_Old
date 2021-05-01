@@ -37,8 +37,9 @@ else
             @foreach (var book in Books)
             {
                 <tr>
+
                     <td>
-                        <img src="images/@book.Image" class="img-thumbnail" style="height:50px; width:50px" />
+                        <img src="@string.Format("data:image/png;base64,{0}", book.File)" class="img-thumbnail" style="height:100px;width:100px"/>
                     </td>
                     <td>@book.Title</td>
                     <td>@string.Format("{0:C}", book.Price)</td>

@@ -15,7 +15,7 @@ else
     @foreach (var book in Books)
     {
         <div>
-            <img src="images/@book.Image"/>
+            <img src="@string.Format("data:image/png;base64,{0}", book.File)"/>
             <a href="/test/update/@book.Id" class="btn btn-primary m-2">
                 View
             </a>
