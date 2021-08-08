@@ -5,7 +5,6 @@
 
 @inject IBookRepository _bookRepo
 @inject IAuthorRepository _authRepo
-@inject IFileUpload _fileUpload
 @inject NavigationManager _navManager
 @inject IToastService _toastService
 
@@ -58,22 +57,28 @@ else
             <InputTextArea @bind-Value="Book.Summary" class="form-control" id="summary" />
         </div>
 
-        <div class="form-group">
-            <label for="bookcover">Book Cover Photo</label>
-            <InputFile OnChange="HandleFileSelection" />
-            @if (isInvalidFileType)
-            {
-                <ErrorComponent Message="Please remove the invalid file type and select as new image, or leave this field blank" />
-            }
-            @if (!string.IsNullOrWhiteSpace(imageDataURL))
-            {
-                <img src="@imageDataURL" style="height:100px;width:100px"/>
-            }
-            else if (!string.IsNullOrWhiteSpace(Book.Image))
-            {
-                <img src="@string.Format("data:image/png;base64,{0}", Book.File)" style="height:100px;width:100px" />
-            }
+        <div class="row m-1">
+            <div class="col-3">
+                <InputFile OnChange="HandleFileSelection" class="custom-file-input" />
+                <label class="custom-file-label">Choose file...</label>
+            </div>
+
+            <div class="col d-flex justify-content-center">
+                @if (isInvalidFileType)
+                {
+                    <ErrorComponent Message="Please remove the invalid file type and select as new image, or leave this field blank" />
+                }
+                @if (!string.IsNullOrWhiteSpace(imageDataURL))
+                {
+                    <img src="@imageDataURL" />
+                }
+                else if (!string.IsNullOrWhiteSpace(Book.Image))
+                {
+                    <img src="@string.Format("data:image/png;base64,{0}", Book.File)" />
+                }
+            </div>
         </div>
+
 
         <button class="btn btn-primary" type="submit">
             <span class="oi oi-pencil"></span>
@@ -118,14 +123,13 @@ else
                 var picId = Guid.NewGuid().ToString().Replace("-", "");
                 var picName = $"{picId}{ext}";
 
-                _fileUpload.RemoveFile(Book.Image);
-                await _fileUpload.UploadFile(sFile, picName);
-
                 Book.Image = picName;
+                var buffer = new byte[file.Size];
+                await file.OpenReadStream().ReadAsync(buffer);
+                Book.File = Convert.ToBase64String(buffer);
             }
             else if (isFileChanged && file == null)
             {
-                _fileUpload.RemoveFile(Book.Image);
                 Book.Image = string.Empty;
             }
 
@@ -135,9 +139,12 @@ else
                 _toastService.ShowSuccess("Book Updated Successfully");
                 _navManager.NavigateTo("/books");
             }
+            else
+            {
+                _toastService.ShowError("Pic wasn't updated");
+            }
         }
     }
-
 
     private async Task HandleFileSelection(InputFileChangeEventArgs e)
     {
@@ -148,8 +155,7 @@ else
             var ext = Path.GetExtension(file.Name);
             if (ext.Contains("jpg") || ext.Contains("png") || ext.Contains("jpeg"))
             {
-                // image less the 10mb
-                sFile = file.OpenReadStream(10960000);
+                sFile = file.OpenReadStream();
 
                 var resizedImageFile = await file.RequestImageFileAsync("image/png",
             100, 100);
@@ -157,7 +163,6 @@ else
                 var buffer = new byte[resizedImageFile.Size];
                 await resizedImageFile.OpenReadStream().ReadAsync(buffer);
 
-                // pentru ca sa afisam img pe ecran inaite sa facem Update in db
                 var imageBase64Data = Convert.ToBase64String(buffer);
                 imageDataURL = string.Format("data:image/png;base64,{0}", imageBase64Data);
                 isInvalidFileType = false;

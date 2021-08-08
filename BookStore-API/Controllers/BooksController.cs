@@ -17,7 +17,7 @@ namespace BookStore_API.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class BooksController : ControllerBase
     {
         private readonly IBookRepository _bookRepository;
@@ -294,7 +294,7 @@ namespace BookStore_API.Controllers
                 }
             }
 
-            if (!string.IsNullOrEmpty(file))
+            if (!string.IsNullOrWhiteSpace(file))
             {
                 var imgPath = $"{_environment.ContentRootPath}\\images\\{image}";
                 byte[] imageBytes = Convert.FromBase64String(file);

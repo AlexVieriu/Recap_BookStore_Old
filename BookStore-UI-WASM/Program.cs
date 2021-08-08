@@ -22,6 +22,8 @@ namespace BookStore_UI_WASM
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
+            _ = new JwtHeader();
+            _ = new JwtPayload();
 
             builder.Services.AddScoped(sp => new HttpClient
                 { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
@@ -32,7 +34,6 @@ namespace BookStore_UI_WASM
             builder.Services.AddScoped<ApiAuthenticationStateProvider>();
             builder.Services.AddScoped<AuthenticationStateProvider>(p =>
                 p.GetRequiredService<ApiAuthenticationStateProvider>());
-            builder.Services.AddScoped<JwtSecurityTokenHandler>();
 
             builder.Services.AddTransient<IAuthentificationRepository, AuthentificationRepository>();
             builder.Services.AddTransient<IAuthorRepository, AuthorRepository>();
@@ -40,7 +41,6 @@ namespace BookStore_UI_WASM
 
             builder.Services.AddOptions();
             builder.Services.AddAuthorizationCore();
-            //builder.Services.AddTransient<IFileUpload, FileUpload>();
 
             await builder.Build().RunAsync();
         }

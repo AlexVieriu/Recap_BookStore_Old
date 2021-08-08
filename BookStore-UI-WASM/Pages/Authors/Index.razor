@@ -1,5 +1,7 @@
 ﻿@page "/authors"
 
+@attribute [Authorize]
+
 @inject IAuthorRepository _authRepo
 
 @if (Authors == null)
@@ -18,7 +20,7 @@ else
         <br />
         <br />
     </AuthorizeView>
-    
+
 
     @if (Authors.Count < 1)
     {
@@ -55,7 +57,7 @@ else
                                 <a href="/authors/delete/@author.Id" class="btn btn-danger">
                                     <span class="oi oi-delete"></span> Delete
                                 </a>
-                            </AuthorizeView>                                                           
+                            </AuthorizeView>
                         </td>
                     </tr>
                 }
@@ -72,5 +74,4 @@ else
     {
         Authors = await _authRepo.GetAll(Endpoints.AuthorUrl);
     }
-
 }

@@ -29,7 +29,7 @@
 
     <div class="form-group">
         <label for="isbn">ISBN</label>
-        <InputText @bind-Value="Book.Isbn"id="isbn" class="form-control"  />
+        <InputText @bind-Value="Book.Isbn" id="isbn" class="form-control" />
     </div>
 
     <div class="form-group">
@@ -56,17 +56,22 @@
         <InputTextArea @bind-Value="Book.Summary" class="form-control" id="summary" />
     </div>
 
-    <div class="form-group">
-        <label for="bookcover">Book Cover Photo</label>
-        <InputFile OnChange="HandleFileSelection" />
-        @if (isInvalidFileType)
-        {
-            <ErrorComponent Message="The file is not a image, please select a image" />
-        }
-        @if (!string.IsNullOrWhiteSpace(imageDataURL))
-        {
-            <img src="@imageDataURL" style="height:100px;width:100px" />
-        }
+    <div class="row m-1">
+        <div class="col-3">
+            <InputFile OnChange="HandleFileSelection" class="custom-file-input" />
+            <label class="custom-file-label">Choose file...</label>
+        </div>
+
+        <div class="col d-flex justify-content-center">
+            @if (isInvalidFileType)
+            {
+                <ErrorComponent Message="The file is not a image, please select a image" />
+            }
+            @if (!string.IsNullOrWhiteSpace(imageDataURL))
+            {
+                <img src="@imageDataURL" />
+            }
+        </div>
     </div>
 
     <button class="btn btn-primary" type="submit">
@@ -131,7 +136,7 @@
             {
                 sFile = file.OpenReadStream();
 
-                var resizedImageFile = await file.RequestImageFileAsync("image/png", 30, 30);
+                var resizedImageFile = await file.RequestImageFileAsync("image/png", 100, 100);
 
                 var buffer = new byte[resizedImageFile.Size];
                 await resizedImageFile.OpenReadStream().ReadAsync(buffer);

@@ -181,8 +181,6 @@ services.AddSingleton<ILoggerService, LoggerService>();
 
 11. CORS Configuration (Cross Origin Resource Sharing)
 
--> mechanism that gives rights to other users how are not on the same domain as us
-
 services.AddCors(o =>
             {
                 o.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin()
@@ -194,3 +192,47 @@ Add it to the pipeline:
 
 app.UseCors("CorsPolicy");
 
+
+Dictionary:
+
+CORS:
+-> mechanism that gives rights to other users how are not on the same domain as us
+-> browser security prevents a web page from making requests to a different domain 
+than the one that served the web page
+-> this restriction is called the same-origin policy
+-> the same-origin policy prevents a malicious site from reading sensitive data from another site
+https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-6.0
+
+
+There are three ways to enable CORS:
+
+-> In middleware using a named policy or default policy
+-> Using endpoint routing
+-> With the [EnableCors] attribute
+
+-> UseCors must be called in the correct order. For more information
+https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-6.0#middleware-order
+
+
+-- Middleware --
+Middleware is software that's assembled into an app pipeline to handle requests 
+and responses. Each component:
+
+-> chooses whether to pass the request to the next component in the pipeline.
+-> can perform work before and after the next component in the pipeline.
+
+-> Request delegates are used to build the request pipeline
+
+IApplicationBuilder : Defines a class that provides the mechanisms to configure an 
+                      application's request pipeline.
+
+Path:
+ChangeExtension             (string? path, string? extension);
+Combine                     (string path1, string path2)
+GetDirectoryName            (string? path)
+GetExtension                (string? path)
+GetFileName                 (string? path)
+GetFileNameWithoutExtension (string? path)
+GetFullPath                 (string path)
+GetPathRoot                 (string? path)    
+Join                        (string? path1, string? path2)

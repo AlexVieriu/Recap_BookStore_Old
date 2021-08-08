@@ -3,7 +3,6 @@
 @attribute [Authorize(Roles = "Administrator")]
 
 @inject IBookRepository _bookRepo
-@inject IFileUpload _fileUpdate
 @inject IToastService _toastService
 @inject NavigationManager _navManager
 
@@ -69,7 +68,7 @@ else
         </div>
 
         <div class="col-6">
-            <img src="@string.Format("data:image/png;base64,{0}", Book.File)" style="height:300px; width:300px" />
+            <img src="@string.Format("data:image/png;base64,{0}", Book.File)" />
             <h4 class="text-center text-info">@string.Format("{0:C}", Book.Price)</h4>
         </div>
 

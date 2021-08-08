@@ -25,6 +25,8 @@ builder.Services.AddAuthorizationCore();
 
 71. Modify Code for Blazor WebAssembly
 
+-> delete FileUpload, IFileUpload (we don't need them)
+
 
 72. Essential Layout Fixes and Additions
 
@@ -33,10 +35,12 @@ builder.Services.AddAuthorizationCore();
 <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
 
 -> extend our API
--> UploadFile to the API
 
 
 73. File Upload Support (Create and View)
+
+-> Create Css files for every CRUD razor page(ex: Create.razor.css)
+-> change the size of the img
 
 -> add prop File to classes: 
 
@@ -77,7 +81,7 @@ Create.razor:
 
 
 View.razor:
--> <img src="@string.Format("data:image/png;base64,{0}", Book.File)" style="height:300px; width:300px" />
+-> <img src="@string.Format("data:image/png;base64,{0}", Book.File)" />
 
 
 -- BookStore-API --
@@ -147,5 +151,29 @@ StoreFileImg(bookCreateDTO.File, bookCreateDTO.Image, oldImage);
 
 
 74. File Upload Support (List and Edit)
+
+-- BookStore-UI-WASM -> Pages -> Books --
+-- Delete.razor --
+
+<div class="col-6">
+    <img src="@string.Format("data:image/png;base64,{0}", Book.File)" />
+    <h4 class="text-center text-info">@string.Format("{0:C}", Book.Price)</h4>
+</div>
+
+-- Index.razor --
+<img src="@string.Format("data:image/png;base64,{0}", book.File)"/>
+
+--Update.razor-- 
+UI: <img src="@string.Format("data:image/png;base64,{0}", Book.File)" />
+
+Code:
+
+
+-- BooksController.cs --
+
+-> Update()
+var oldImage = await _bookRepository.GetImageFileName(id);
+StoreFileImg(bookCreateDTO.File, bookCreateDTO.Image, oldImage);
+
 
 75. Progressive Web Application

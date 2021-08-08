@@ -51,19 +51,18 @@ else
                 <InputTextArea class="form-control" @bind-Value="authorModel.Bio" />
             </div>
             <br />
-            <button type="submit" class="btn btn-primary">Update Author</button>
+            <div class="row">
+                <button type="submit" class="btn btn-outline-primary col-3 m-2">
+                    Update Author
+                </button>
 
+                <a href="/authors" class="btn btn-outline-secondary col-3 m-2">
+                    <span class="oi oi-media-skip-backward"></span> Back To List
+                </a>
+            </div>
         </EditForm>
     </div>
-    <br />
-
-    <br />
-    <a href="/authors" class="btn btn-secondary">
-        <span class="oi oi-media-step-backward"></span> Back To List
-    </a>
 }
-
-
 
 @code{
     [Parameter]

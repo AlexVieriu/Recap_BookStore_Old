@@ -16,9 +16,7 @@ else
             <span class="oi oi-plus"></span> Create New Author
         </a>
         <br />
-        <br />
-    </AuthorizeView>
-    
+    </AuthorizeView>    
 
     @if (Authors.Count < 1)
     {
@@ -72,5 +70,4 @@ else
     {
         Authors = await _authRepo.GetAll(Endpoints.AuthorUrl);
     }
-
 }
