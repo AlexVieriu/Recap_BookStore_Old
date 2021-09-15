@@ -125,18 +125,19 @@ namespace BookStore_API.Controllers
                 user.UserName
                 GUID
                 user roles
-            */
+            */            
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),                
             };
 
             var roles = await _userManager.GetRolesAsync(user);
 
             claims.AddRange(roles.Select(r => new Claim(ClaimsIdentity.DefaultRoleClaimType, r)));
-    
+
             /*
             string issuer = null, 
             string audience = null, 
@@ -155,6 +156,7 @@ namespace BookStore_API.Controllers
                 expires: DateTime.Now.AddMinutes(50),
                 signingCredentials : credentials
                 ); 
+
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
             return tokenString;

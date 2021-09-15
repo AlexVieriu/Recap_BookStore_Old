@@ -12,9 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System;
-using System.IO;
-using System.Reflection;
 using System.Text;
 
 namespace BookStore_API
@@ -88,9 +85,9 @@ namespace BookStore_API
                     });
 
                 // C:\Users\alexandru.vieriu\Desktop\Recap_BookStore\BookStore-API\BookStore-API.xml
-                var xfile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xpath = Path.Combine(AppContext.BaseDirectory, xfile);
-                c.IncludeXmlComments(xpath);
+                //var xfile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                //var xpath = Path.Combine(AppContext.BaseDirectory, xfile);
+                //c.IncludeXmlComments(xpath);
             });
         }
 

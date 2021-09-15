@@ -2,15 +2,15 @@ using Blazored.LocalStorage;
 using BookStore_UI.Servicies;
 using BookStore_UI.Servicies.Contracts;
 using BookStore_UI.Providers;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System.IdentityModel.Tokens.Jwt;
 using Blazored.Toast;
 using BookStore_UI.Pages._Theory.ImageUpload;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace BookStore_UI
 {
